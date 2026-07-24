@@ -1,0 +1,9 @@
+{
+  "name": "dosi-dm-companion",
+  "private": true,
+  "workspaces": [
+    "ingest",
+    "worker",
+    "frontend"
+  ]
+}

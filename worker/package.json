@@ -1,0 +1,16 @@
+{
+  "name": "worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:migrate:local": "wrangler d1 execute dosi-db --local --file=./schema.sql",
+    "db:migrate:remote": "wrangler d1 execute dosi-db --remote --file=./schema.sql"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0",
+    "typescript": "^5.7.2",
+    "@cloudflare/workers-types": "^4.20250109.0"
+  }
+}

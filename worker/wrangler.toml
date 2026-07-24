@@ -1,0 +1,15 @@
+name = "dosi-dm-companion-worker"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "dosi-db"
+database_id = "49fdc94b-962d-41df-b229-3a194fdc7393"
+
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "dosi-sections"
+
+[ai]
+binding = "AI"
