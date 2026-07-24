@@ -8,6 +8,12 @@ export async function search(query: string): Promise<SearchResult[]> {
   return data.results;
 }
 
+export async function getCampaign(): Promise<SectionDetail[]> {
+  const res = await fetch(`${API_URL}/api/campaign`);
+  const data = (await res.json()) as { sections: SectionDetail[] };
+  return data.sections;
+}
+
 export async function getSection(id: string): Promise<SectionDetail> {
   const res = await fetch(`${API_URL}/api/sections/${encodeURIComponent(id)}`);
   if (!res.ok) throw new Error(`Section not found: ${id}`);

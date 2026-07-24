@@ -99,6 +99,53 @@ export async function getSectionDetail(env: Env, id: string): Promise<SectionDet
   };
 }
 
+export async function getCampaignSections(env: Env): Promise<SectionDetail[]> {
+  const { results: sections } = await env.DB.prepare(
+    `SELECT * FROM sections WHERE type != 'creature' AND type != 'item' ORDER BY "order" ASC`
+  ).all<SectionRow>();
+  if (sections.length === 0) return [];
+
+  const { results: allReveals } = await env.DB.prepare(
+    `SELECT r.id, r.section_id, r.trigger_skill, r.trigger_dc, r.text, r.revealed FROM reveals r
+     JOIN sections s ON s.id = r.section_id
+     WHERE s.type != 'creature' AND s.type != 'item'`
+  ).all<{ id: number; section_id: string; trigger_skill: string; trigger_dc: number; text: string; revealed: number }>();
+
+  const { results: allReferences } = await env.DB.prepare(
+    `SELECT sr.source_section_id, ref.id, ref.heading, ref.type FROM section_references sr
+     JOIN sections src ON src.id = sr.source_section_id
+     JOIN sections ref ON ref.id = sr.referenced_section_id
+     WHERE src.type != 'creature' AND src.type != 'item'`
+  ).all<{ source_section_id: string; id: string; heading: string; type: SectionType }>();
+
+  const revealsBySection = new Map<string, Reveal[]>();
+  for (const r of allReveals) {
+    const list = revealsBySection.get(r.section_id) ?? [];
+    list.push({ id: r.id, trigger_skill: r.trigger_skill, trigger_dc: r.trigger_dc, text: r.text, revealed: Boolean(r.revealed) });
+    revealsBySection.set(r.section_id, list);
+  }
+
+  const referencesBySection = new Map<string, { id: string; heading: string; type: SectionType }[]>();
+  for (const r of allReferences) {
+    const list = referencesBySection.get(r.source_section_id) ?? [];
+    list.push({ id: r.id, heading: r.heading, type: r.type });
+    referencesBySection.set(r.source_section_id, list);
+  }
+
+  return sections.map((section) => ({
+    id: section.id,
+    chapter: section.chapter,
+    heading: section.heading,
+    heading_path: JSON.parse(section.heading_path),
+    type: section.type,
+    read_aloud_text: section.read_aloud_text,
+    dm_only_text: section.dm_only_text,
+    reveals: revealsBySection.get(section.id) ?? [],
+    stat_block: null,
+    references: referencesBySection.get(section.id) ?? [],
+  }));
+}
+
 export async function getNarrativeReferencesTo(env: Env, creatureSectionId: string) {
   const { results } = await env.DB.prepare(
     `SELECT s.id, s.heading, s.chapter, s.dm_only_text, s.read_aloud_text FROM section_references sr

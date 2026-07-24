@@ -4,6 +4,7 @@ import { handleChat } from "./routes/chat.js";
 import { handleGetSection, handleGetNarrativeReferences } from "./routes/sections.js";
 import { handleToggleReveal } from "./routes/reveals.js";
 import { handleLoadSections } from "./routes/admin.js";
+import { handleGetCampaign } from "./routes/campaign.js";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -24,6 +25,8 @@ export default {
     try {
       if (pathname === "/api/search" && request.method === "GET") {
         response = await handleSearch(request, env);
+      } else if (pathname === "/api/campaign" && request.method === "GET") {
+        response = await handleGetCampaign(env);
       } else if (pathname === "/api/chat" && request.method === "POST") {
         response = await handleChat(request, env);
       } else if (pathname === "/admin/load-sections" && request.method === "POST") {

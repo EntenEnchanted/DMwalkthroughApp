@@ -1,17 +1,21 @@
 import { useState } from "react";
 import { PopupProvider } from "./PopupContext";
+import { CampaignView } from "./components/CampaignView";
 import { SearchView } from "./components/SearchView";
 import { ChatView } from "./components/ChatView";
 
-type Tab = "search" | "chat";
+type Tab = "campaign" | "search" | "chat";
 
 function App() {
-  const [tab, setTab] = useState<Tab>("search");
+  const [tab, setTab] = useState<Tab>("campaign");
 
   return (
     <PopupProvider>
       <div className="app">
         <div className="tab-bar">
+          <button className={tab === "campaign" ? "active" : ""} onClick={() => setTab("campaign")}>
+            Campaign
+          </button>
           <button className={tab === "search" ? "active" : ""} onClick={() => setTab("search")}>
             Search
           </button>
@@ -20,13 +24,17 @@ function App() {
           </button>
         </div>
 
-        {tab === "search" ? (
+        {tab === "campaign" && (
+          <div className="app-content">
+            <CampaignView />
+          </div>
+        )}
+        {tab === "search" && (
           <div className="app-content">
             <SearchView />
           </div>
-        ) : (
-          <ChatView />
         )}
+        {tab === "chat" && <ChatView />}
       </div>
     </PopupProvider>
   );

@@ -244,6 +244,66 @@ input {
   color: var(--accent);
 }
 
+/* Campaign browse */
+
+.chapter-group {
+  margin-top: 8px;
+}
+
+.chapter-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.chapter-header.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chapter-caret {
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+.chapter-outline {
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.outline-row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.outline-row:hover {
+  background: var(--bg-inset);
+  color: var(--text);
+}
+
+.outline-row.active {
+  color: var(--text);
+  background: var(--bg-inset);
+  font-weight: 600;
+}
+
 .empty-state {
   color: var(--text-dim);
   text-align: center;
