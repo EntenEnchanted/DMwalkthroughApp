@@ -146,6 +146,13 @@ export async function getCampaignSections(env: Env): Promise<SectionDetail[]> {
   }));
 }
 
+export async function getCreatureSections(env: Env): Promise<{ id: string; heading: string; chapter: string }[]> {
+  const { results } = await env.DB.prepare(
+    `SELECT id, heading, chapter FROM sections WHERE type = 'creature' ORDER BY heading ASC`
+  ).all<{ id: string; heading: string; chapter: string }>();
+  return results;
+}
+
 export async function getNarrativeReferencesTo(env: Env, creatureSectionId: string) {
   const { results } = await env.DB.prepare(
     `SELECT s.id, s.heading, s.chapter, s.dm_only_text, s.read_aloud_text FROM section_references sr

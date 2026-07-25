@@ -1,4 +1,4 @@
-import type { NarrativeReference, SearchResult, SectionDetail } from "./types";
+import type { CreatureSummary, NarrativeReference, SearchResult, SectionDetail } from "./types";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8787";
 
@@ -12,6 +12,12 @@ export async function getCampaign(): Promise<SectionDetail[]> {
   const res = await fetch(`${API_URL}/api/campaign`);
   const data = (await res.json()) as { sections: SectionDetail[] };
   return data.sections;
+}
+
+export async function getCreatures(): Promise<CreatureSummary[]> {
+  const res = await fetch(`${API_URL}/api/creatures`);
+  const data = (await res.json()) as { creatures: CreatureSummary[] };
+  return data.creatures;
 }
 
 export async function getSection(id: string): Promise<SectionDetail> {

@@ -50,6 +50,12 @@ export interface CreatureStatBlock {
   bonus_actions?: { name: string; text: string }[];
 }
 
+export interface CreatureSummary {
+  id: string;
+  heading: string;
+  chapter: string;
+}
+
 export interface NarrativeReference {
   id: string;
   heading: string;

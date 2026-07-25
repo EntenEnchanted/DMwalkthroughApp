@@ -5,6 +5,7 @@ import { handleGetSection, handleGetNarrativeReferences } from "./routes/section
 import { handleToggleReveal } from "./routes/reveals.js";
 import { handleLoadSections } from "./routes/admin.js";
 import { handleGetCampaign } from "./routes/campaign.js";
+import { handleGetCreatures } from "./routes/creatures.js";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -27,6 +28,8 @@ export default {
         response = await handleSearch(request, env);
       } else if (pathname === "/api/campaign" && request.method === "GET") {
         response = await handleGetCampaign(env);
+      } else if (pathname === "/api/creatures" && request.method === "GET") {
+        response = await handleGetCreatures(env);
       } else if (pathname === "/api/chat" && request.method === "POST") {
         response = await handleChat(request, env);
       } else if (pathname === "/admin/load-sections" && request.method === "POST") {

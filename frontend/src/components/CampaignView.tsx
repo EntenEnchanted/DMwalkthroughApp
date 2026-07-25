@@ -23,24 +23,42 @@ function groupByChapter(sections: SectionDetail[]): Chapter[] {
 
 export function CampaignView() {
   const [chapters, setChapters] = useState<Chapter[] | null>(null);
-  const [openChapter, setOpenChapter] = useState<string | null>(null);
-  const [openSectionId, setOpenSectionId] = useState<string | null>(null);
+  const [closedChapters, setClosedChapters] = useState<Set<string>>(new Set());
+  const [closedSections, setClosedSections] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     getCampaign().then((sections) => setChapters(groupByChapter(sections)));
   }, []);
+
+  function toggleChapter(chapter: string) {
+    setClosedChapters((prev) => {
+      const next = new Set(prev);
+      if (next.has(chapter)) next.delete(chapter);
+      else next.add(chapter);
+      return next;
+    });
+  }
+
+  function toggleSection(id: string) {
+    setClosedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   if (!chapters) return <div className="empty-state">Loading campaign…</div>;
 
   return (
     <div>
       {chapters.map((c) => {
-        const isOpen = openChapter === c.chapter;
+        const isOpen = !closedChapters.has(c.chapter);
         return (
           <div key={c.chapter} className="chapter-group">
             <button
               className={`chapter-header ${isOpen ? "active" : ""}`}
-              onClick={() => setOpenChapter(isOpen ? null : c.chapter)}
+              onClick={() => toggleChapter(c.chapter)}
             >
               <span>{c.chapter}</span>
               <span className="chapter-caret">{isOpen ? "−" : "+"}</span>
@@ -49,13 +67,13 @@ export function CampaignView() {
               <div className="chapter-outline">
                 {c.sections.map((s) => {
                   const depth = s.heading_path.length;
-                  const sectionOpen = openSectionId === s.id;
+                  const sectionOpen = !closedSections.has(s.id);
                   return (
                     <div key={s.id}>
                       <button
                         className={`outline-row ${sectionOpen ? "active" : ""}`}
                         style={{ paddingLeft: 12 + depth * 16 }}
-                        onClick={() => setOpenSectionId(sectionOpen ? null : s.id)}
+                        onClick={() => toggleSection(s.id)}
                       >
                         <span className="type-badge">{s.type}</span>
                         {s.heading}
