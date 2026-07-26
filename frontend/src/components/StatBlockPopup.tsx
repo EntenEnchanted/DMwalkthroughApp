@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getNarrativeReferences, getSection } from "../api";
 import type { CreatureStatBlock, NarrativeReference, SectionDetail } from "../types";
+import { DmOnlyText } from "../dmText";
 
 export function StatBlockPopup({ sectionId, onClose }: { sectionId: string; onClose: () => void }) {
   const [section, setSection] = useState<SectionDetail | null>(null);
@@ -41,7 +42,9 @@ export function StatBlockPopup({ sectionId, onClose }: { sectionId: string; onCl
               (section.stat_block ? (
                 <StatBlockView stats={section.stat_block} />
               ) : (
-                <div className="tier-block dm-only">{section.dm_only_text || "No details available."}</div>
+                <div className="tier-block dm-only">
+                  {section.dm_only_text ? <DmOnlyText text={section.dm_only_text} /> : "No details available."}
+                </div>
               ))}
 
             {tab === "narrative" && (
@@ -52,7 +55,11 @@ export function StatBlockPopup({ sectionId, onClose }: { sectionId: string; onCl
                       {n.heading} — {n.chapter}
                     </h4>
                     {n.read_aloud_text && <div className="tier-block read-aloud">{n.read_aloud_text}</div>}
-                    {n.dm_only_text && <div className="tier-block dm-only">{n.dm_only_text}</div>}
+                    {n.dm_only_text && (
+                      <div className="tier-block dm-only">
+                        <DmOnlyText text={n.dm_only_text} />
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

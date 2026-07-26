@@ -12,7 +12,15 @@ For each section of text you're given, classify it and split it into tiers:
 boxed-quote delimiters, or explicit cues like "Read this text" / "Read or paraphrase". Preserve the \
 text closely; strip only the ">>" delimiters themselves. Empty string if none.
 - dm_only_text: everything else — background, motivations, secrets, running notes, rules explanations. \
-This is the default tier for prose that isn't read-aloud and isn't a conditional reveal.
+This is the default tier for prose that isn't read-aloud and isn't a conditional reveal. Within this text, \
+wrap any sentence or clause whose guidance branches on what the party has already done — a prior fight's \
+outcome, a choice they made, an NPC they have or haven't met, an item they do or don't have — in \
+<cond></cond> tags, e.g. "<cond>If the characters defeated the zombies at the beach, she thanks them for \
+their service to the cloister.</cond> Even if they did not fight the zombies, she welcomes them anyway." \
+This flags branch-dependent DM notes so they stand out from fixed background; it is NOT for the \
+skill-check reveals below (those are extracted separately, never wrapped inline), and NOT for text that's \
+merely about the adventure's plot in general — only for clauses conditioned on the party's own prior \
+actions or state.
 - reveals: conditional-reveal items woven into the prose as sentences like "A character who succeeds on \
 a DC 15 Intelligence (History) check learns...". Extract each as {trigger_skill, trigger_dc, text}, where \
 text is what the players learn on success. Remove the reveal sentence from dm_only_text once extracted \
