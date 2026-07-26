@@ -3,7 +3,7 @@ import { handleSearch } from "./routes/search.js";
 import { handleChat } from "./routes/chat.js";
 import { handleGetSection, handleGetNarrativeReferences } from "./routes/sections.js";
 import { handleToggleReveal } from "./routes/reveals.js";
-import { handleLoadSections, handleRetagDirectives } from "./routes/admin.js";
+import { handleLoadSections } from "./routes/admin.js";
 import { handleGetCampaign } from "./routes/campaign.js";
 import { handleGetCreatures } from "./routes/creatures.js";
 
@@ -34,8 +34,6 @@ export default {
         response = await handleChat(request, env);
       } else if (pathname === "/admin/load-sections" && request.method === "POST") {
         response = await handleLoadSections(request, env);
-      } else if (pathname === "/admin/retag-directives" && request.method === "POST") {
-        response = await handleRetagDirectives(request, env);
       } else {
         const sectionMatch = /^\/api\/sections\/([^/]+)$/.exec(pathname);
         const narrativeMatch = /^\/api\/sections\/([^/]+)\/narrative-references$/.exec(pathname);
