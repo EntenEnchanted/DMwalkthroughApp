@@ -4,6 +4,7 @@ export interface Env {
   AI: Ai;
   ANTHROPIC_API_KEY: string;
   ADMIN_TOKEN: string;
+  RETAG_ADMIN_TOKEN?: string;
 }
 
 export type SectionType = "location" | "encounter" | "creature" | "item" | "reference";
