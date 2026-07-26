@@ -23,7 +23,7 @@ CRITICAL: Do not change, add, remove, or reword any part of the text. Only inser
 unchanged except for these inserted markers.`;
 
 async function tagDirectives(env: Env, text: string): Promise<string | null> {
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < 2; attempt++) {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -69,11 +69,26 @@ export async function handleRetagDirectives(request: Request, env: Env): Promise
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const { results } = await env.DB.prepare(
-    `SELECT id, dm_only_text FROM sections WHERE type NOT IN ('creature', 'item') AND dm_only_text != ''`
-  ).all<{ id: string; dm_only_text: string }>();
+  // Each fetch() call counts against the per-invocation subrequest limit, so callers
+  // must pass a small `ids` batch (e.g. 12-15) rather than processing everything at once.
+  const raw = await request.text();
+  const body = raw ? (JSON.parse(raw) as { ids?: string[] }) : {};
 
-  const CONCURRENCY = 5;
+  let results: { id: string; dm_only_text: string }[];
+  if (body.ids && body.ids.length > 0) {
+    const placeholders = body.ids.map(() => "?").join(",");
+    const { results: rows } = await env.DB.prepare(`SELECT id, dm_only_text FROM sections WHERE id IN (${placeholders})`)
+      .bind(...body.ids)
+      .all<{ id: string; dm_only_text: string }>();
+    results = rows;
+  } else {
+    const { results: rows } = await env.DB.prepare(
+      `SELECT id, dm_only_text FROM sections WHERE type NOT IN ('creature', 'item') AND dm_only_text != '' LIMIT 12`
+    ).all<{ id: string; dm_only_text: string }>();
+    results = rows;
+  }
+
+  const CONCURRENCY = 4;
   const summary: { id: string; status: string }[] = [];
 
   for (let i = 0; i < results.length; i += CONCURRENCY) {
