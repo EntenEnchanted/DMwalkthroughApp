@@ -12,7 +12,11 @@ For each section of text you're given, classify it and split it into tiers:
 boxed-quote delimiters, or explicit cues like "Read this text" / "Read or paraphrase". Preserve the \
 text closely; strip only the ">>" delimiters themselves. Empty string if none.
 - dm_only_text: everything else — background, motivations, secrets, running notes, rules explanations. \
-This is the default tier for prose that isn't read-aloud and isn't a conditional reveal.
+This is the default tier for prose that isn't read-aloud and isn't a conditional reveal. Within this text, \
+wrap any sentence that directs the DM to do something or prompt the players to act — e.g. "encourage the \
+players to...", "ask the players for...", "have a player make a check", "continue with the X section" — in \
+[[directive]]...[[/directive]] markers, so the app can highlight it separately from background/reference \
+information. Only wrap actual instructions, not the surrounding context or plain lore.
 - reveals: conditional-reveal items woven into the prose as sentences like "A character who succeeds on \
 a DC 15 Intelligence (History) check learns...". Extract each as {trigger_skill, trigger_dc, text}, where \
 text is what the players learn on success. Remove the reveal sentence from dm_only_text once extracted \
@@ -39,7 +43,10 @@ const CORRUPTION_MARKERS = ["</dm_only_text>", "</read_aloud_text>", "<parameter
 const MAX_ATTEMPTS = 3;
 
 function looksCorrupted(text: string): boolean {
-  return CORRUPTION_MARKERS.some((marker) => text.includes(marker));
+  if (CORRUPTION_MARKERS.some((marker) => text.includes(marker))) return true;
+  const opens = (text.match(/\[\[directive\]\]/g) ?? []).length;
+  const closes = (text.match(/\[\[\/directive\]\]/g) ?? []).length;
+  return opens !== closes;
 }
 
 async function classifyOnce(
