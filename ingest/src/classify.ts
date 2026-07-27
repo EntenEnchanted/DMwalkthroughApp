@@ -60,6 +60,17 @@ function looksCorrupted(text: string): boolean {
   return dirOpens !== dirCloses;
 }
 
+/** Last-resort safety net: if retries are exhausted and text still looks corrupted, hard-truncate
+ * at the first corruption marker rather than ever saving mangled tool-call artifacts. */
+function sanitize(text: string): string {
+  let cut = -1;
+  for (const marker of CORRUPTION_MARKERS) {
+    const i = text.indexOf(marker);
+    if (i !== -1 && (cut === -1 || i < cut)) cut = i;
+  }
+  return cut === -1 ? text : text.slice(0, cut).trimEnd();
+}
+
 async function classifyOnce(
   section: ParsedSection,
   creatureNames: string[]
@@ -75,7 +86,7 @@ async function classifyOnce(
 
   const response = await getClient().messages.create({
     model: MODEL,
-    max_tokens: 4096,
+    max_tokens: 8192,
     system,
     messages: [
       {
@@ -148,8 +159,8 @@ export async function classifySection(
   return {
     ...section,
     type,
-    read_aloud_text: result.read_aloud_text ?? "",
-    dm_only_text: result.dm_only_text ?? "",
+    read_aloud_text: sanitize(result.read_aloud_text ?? ""),
+    dm_only_text: sanitize(result.dm_only_text ?? ""),
     reveals: result.reveals ?? [],
     creature_references: (result.creature_references ?? []).filter((n) => creatureNames.includes(n)),
   };
