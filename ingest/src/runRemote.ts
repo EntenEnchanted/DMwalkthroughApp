@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { writeFileSync, mkdirSync, existsSync, readFileSync } from "node:fs";
+import { writeFileSync, mkdirSync } from "node:fs";
 import { parseMarkdown, extractItemNames, chapterNumber } from "./parseMarkdown.js";
 import { buildCreatureSections } from "./buildCreatureSections.js";
 import { buildItemSections } from "./buildItemSections.js";
@@ -9,8 +9,6 @@ import type { SectionType, Reveal, ParsedSection } from "./types.js";
 const MD_PATH = "../Dragons of Stormwreck Isle.md";
 const SEED_PATH = "../dosi-creatures-seed.json";
 const OUTPUT_DIR = "./output";
-const CHECKPOINT_PATH = `${OUTPUT_DIR}/checkpoint.json`;
-const LOAD_BATCH_SIZE = 10;
 
 interface FinalSection {
   id: string;
@@ -111,23 +109,10 @@ async function main() {
   const allParsedFull = parseMarkdown(MD_PATH);
   const allParsed = limit ? allParsedFull.slice(0, limit) : allParsedFull;
   const skipLoad = process.argv.includes("--skip-load");
-  const resume = process.argv.includes("--resume");
+  console.log(`Classifying ${allParsed.length} sections...`);
 
   const classified: FinalSection[] = [];
-  const doneOrders = new Set<number>();
-  let pendingLoad: FinalSection[] = [];
-
-  if (resume && existsSync(CHECKPOINT_PATH)) {
-    const prior = JSON.parse(readFileSync(CHECKPOINT_PATH, "utf-8")) as FinalSection[];
-    classified.push(...prior);
-    for (const s of prior) doneOrders.add(s.order);
-    console.log(`Resuming: ${prior.length} sections already classified, skipping them.`);
-  }
-
-  const toClassify = allParsed.filter((s) => !doneOrders.has(s.order));
-  console.log(`Classifying ${toClassify.length} sections (${doneOrders.size} already done)...`);
-
-  for (const section of toClassify) {
+  for (const section of allParsed) {
     process.stdout.write(`  [${section.order}] ${section.title} ... `);
     const result = await classifyRemote(section, creatureNames);
     console.log(`${result.type}, ${result.reveals.length} reveal(s), refs: [${result.creature_references.join(", ")}]`);
@@ -136,7 +121,7 @@ async function main() {
       .map((name) => creatureSections.find((c) => (c.stat_block as { name: string }).name === name)?.id)
       .filter((x): x is string => Boolean(x));
 
-    const finalSection: FinalSection = {
+    classified.push({
       id: slugify(String(chapterNumber(section.chapter)), section.title),
       chapter: section.chapter,
       heading: section.title,
@@ -147,24 +132,10 @@ async function main() {
       dm_only_text: result.dm_only_text,
       reveals: result.reveals,
       references: refs,
-    };
-    classified.push(finalSection);
-    pendingLoad.push(finalSection);
-    writeFileSync(CHECKPOINT_PATH, JSON.stringify(classified, null, 2));
-
-    if (!skipLoad && pendingLoad.length >= LOAD_BATCH_SIZE) {
-      await loadIntoWorker(pendingLoad);
-      pendingLoad = [];
-    }
-  }
-
-  if (!skipLoad && pendingLoad.length > 0) {
-    await loadIntoWorker(pendingLoad);
-    pendingLoad = [];
+    });
   }
 
   let output: FinalSection[] = [...classified];
-  let extras: FinalSection[] = [];
   if (!limit) {
     const itemNames = extractItemNames(allParsedFull, MD_PATH);
     const itemSections = buildItemSections(itemNames).map((it, i) => ({
@@ -179,8 +150,7 @@ async function main() {
       reveals: [] as Reveal[],
       references: [] as string[],
     }));
-    extras = [...creatureSections, ...itemSections];
-    output = [...classified, ...extras];
+    output = [...classified, ...creatureSections, ...itemSections];
   }
 
   const outPath = `${OUTPUT_DIR}/chapter-all-remote.json`;
@@ -191,9 +161,7 @@ async function main() {
     console.log("--skip-load set, not loading into worker.");
     return;
   }
-  // narrative sections were already loaded incrementally above; only creature/item sections remain
-  if (extras.length > 0) await loadIntoWorker(extras);
-  console.log("\nDone.");
+  await loadIntoWorker(output);
 }
 
 main().catch((err) => {
