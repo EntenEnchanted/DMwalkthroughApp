@@ -13,14 +13,18 @@ boxed-quote delimiters, or explicit cues like "Read this text" / "Read or paraph
 text closely; strip only the ">>" delimiters themselves. Empty string if none.
 - dm_only_text: everything else — background, motivations, secrets, running notes, rules explanations. \
 This is the default tier for prose that isn't read-aloud and isn't a conditional reveal. Within this text, \
-wrap any sentence or clause whose guidance branches on what the party has already done — a prior fight's \
-outcome, a choice they made, an NPC they have or haven't met, an item they do or don't have — in \
-<cond></cond> tags, e.g. "<cond>If the characters defeated the zombies at the beach, she thanks them for \
-their service to the cloister.</cond> Even if they did not fight the zombies, she welcomes them anyway." \
-This flags branch-dependent DM notes so they stand out from fixed background; it is NOT for the \
+mark two distinct kinds of spans so the app can highlight them separately from plain background prose \
+(a sentence should get at most one of these tags — most dm_only_text needs neither):
+  - <cond></cond>: a sentence or clause whose guidance branches on what the party has already done — a \
+prior fight's outcome, a choice they made, an NPC they have or haven't met, an item they do or don't have. \
+E.g. "<cond>If the characters defeated the zombies at the beach, she thanks them for their service to the \
+cloister.</cond> Even if they did not fight the zombies, she welcomes them anyway." This is NOT for the \
 skill-check reveals below (those are extracted separately, never wrapped inline), and NOT for text that's \
 merely about the adventure's plot in general — only for clauses conditioned on the party's own prior \
 actions or state.
+  - [[directive]]...[[/directive]]: a sentence that directs the DM to do something or prompt the players \
+to act — e.g. "encourage the players to...", "ask the players for...", "have a player make a check", \
+"continue with the X section". Only wrap actual instructions, not the surrounding context or plain lore.
 - reveals: conditional-reveal items woven into the prose as sentences like "A character who succeeds on \
 a DC 15 Intelligence (History) check learns...". Extract each as {trigger_skill, trigger_dc, text}, where \
 text is what the players learn on success. Remove the reveal sentence from dm_only_text once extracted \
@@ -47,7 +51,13 @@ const CORRUPTION_MARKERS = ["</dm_only_text>", "</read_aloud_text>", "<parameter
 const MAX_ATTEMPTS = 3;
 
 function looksCorrupted(text: string): boolean {
-  return CORRUPTION_MARKERS.some((marker) => text.includes(marker));
+  if (CORRUPTION_MARKERS.some((marker) => text.includes(marker))) return true;
+  const condOpens = (text.match(/<cond>/g) ?? []).length;
+  const condCloses = (text.match(/<\/cond>/g) ?? []).length;
+  if (condOpens !== condCloses) return true;
+  const dirOpens = (text.match(/\[\[directive\]\]/g) ?? []).length;
+  const dirCloses = (text.match(/\[\[\/directive\]\]/g) ?? []).length;
+  return dirOpens !== dirCloses;
 }
 
 async function classifyOnce(

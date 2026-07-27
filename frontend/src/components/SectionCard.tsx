@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { SectionDetail } from "../types";
 import { toggleReveal } from "../api";
 import { usePopup } from "../PopupContext";
-import { DmOnlyText } from "../dmText";
+import { renderDmText } from "../dmText";
 
 export function SectionCard({ section }: { section: SectionDetail }) {
   const [reveals, setReveals] = useState(section.reveals);
@@ -33,7 +33,7 @@ export function SectionCard({ section }: { section: SectionDetail }) {
       {section.dm_only_text && (
         <div className="tier-block dm-only">
           <span className="tier-label">DM only</span>
-          <DmOnlyText text={section.dm_only_text} />
+          {renderDmText(section.dm_only_text)}
         </div>
       )}
 
