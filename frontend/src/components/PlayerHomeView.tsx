@@ -4,8 +4,9 @@ import { listMyCharacters } from "../api";
 import type { MyCharacterSummary } from "../types";
 import { CharacterSheetView } from "./CharacterSheetView";
 import { HandbookView } from "./HandbookView";
+import { BattleMapView } from "./BattleMapView";
 
-type View = "sheet" | "handbook";
+type View = "sheet" | "handbook" | "map";
 
 export function PlayerHomeView() {
   const { logout } = useAuth();
@@ -23,15 +24,25 @@ export function PlayerHomeView() {
   if (!characters) return <div className="empty-state">Loading…</div>;
 
   const selected = characters.find((c) => c.id === selectedId);
+  const titles: Record<View, string> = {
+    sheet: selected ? selected.name : "Your Characters",
+    handbook: "Handbook",
+    map: "Battle Map",
+  };
 
   return (
     <div className="picker-screen">
       <div className="picker-header">
-        <h1>{view === "handbook" ? "Handbook" : selected ? selected.name : "Your Characters"}</h1>
+        <h1>{titles[view]}</h1>
         <div>
           <button className={view === "sheet" ? "link-button active" : "link-button"} onClick={() => setView("sheet")}>
             My Character
           </button>
+          {selected && (
+            <button className={view === "map" ? "link-button active" : "link-button"} onClick={() => setView("map")}>
+              Battle Map
+            </button>
+          )}
           <button
             className={view === "handbook" ? "link-button active" : "link-button"}
             onClick={() => setView("handbook")}
@@ -50,6 +61,8 @@ export function PlayerHomeView() {
       </div>
 
       {view === "handbook" && <HandbookView />}
+
+      {view === "map" && selected && <BattleMapView campaignId={selected.campaign_id} myCharacterId={selected.id} />}
 
       {view === "sheet" && characters.length === 0 && (
         <div className="empty-state">Ask your DM for an invite code to join a campaign.</div>

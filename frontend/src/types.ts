@@ -169,3 +169,39 @@ export interface SrdEntryDetail {
   // stays loosely typed and is rendered defensively (see HandbookView).
   data: Record<string, unknown>;
 }
+
+export interface BattleMap {
+  id: string;
+  name: string;
+  image_url: string;
+  grid_size_px: number;
+  width_px: number;
+  height_px: number;
+}
+
+export interface MapSummary {
+  id: string;
+  name: string;
+  created_at: number;
+}
+
+export interface MapToken {
+  id: string;
+  map_id: string;
+  character_id?: string;
+  creature_section_id: string | null;
+  label: string;
+  x: number;
+  y: number;
+  size: number;
+  image_url: string | null;
+  color: string;
+  current_hp: number | null;
+  max_hp: number | null;
+}
+
+export interface ActiveMapState {
+  map: BattleMap | null;
+  tokens: MapToken[];
+  revealed_cells: string[];
+}

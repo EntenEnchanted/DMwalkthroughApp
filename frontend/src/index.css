@@ -450,6 +450,109 @@ input {
   overflow-y: auto;
 }
 
+/* Battle maps */
+
+.map-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.map-toolbar button {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.map-toolbar button.active {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.map-toolbar input[type="color"] {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+}
+
+.map-canvas {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  cursor: crosshair;
+  user-select: none;
+}
+
+.map-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.map-grid-lines {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.18) 1px, transparent 1px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.map-token {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.map-token.selected {
+  outline: 3px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.map-token.locked {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.map-token-label {
+  font-size: 0.6rem;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.map-fog {
+  position: absolute;
+  background: #05050a;
+}
+
+.map-fog-dm {
+  background: rgba(5, 5, 10, 0.45);
+  cursor: pointer;
+}
+
 .empty-state {
   color: var(--text-dim);
   text-align: center;

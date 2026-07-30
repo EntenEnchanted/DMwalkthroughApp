@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AuthProvider, useAuth } from "./AuthContext";
-import { CampaignProvider } from "./CampaignContext";
+import { CampaignProvider, useCampaignId } from "./CampaignContext";
 import { PopupProvider } from "./PopupContext";
 import { CampaignView } from "./components/CampaignView";
 import { SearchView } from "./components/SearchView";
@@ -11,8 +11,14 @@ import { LoginView } from "./components/LoginView";
 import { CampaignPickerView } from "./components/CampaignPickerView";
 import { PlayerHomeView } from "./components/PlayerHomeView";
 import { HandbookView } from "./components/HandbookView";
+import { BattleMapView } from "./components/BattleMapView";
 
-type Tab = "campaign" | "search" | "bestiary" | "roster" | "handbook" | "chat";
+type Tab = "campaign" | "search" | "bestiary" | "roster" | "handbook" | "map" | "chat";
+
+function DmMapTab() {
+  const campaignId = useCampaignId();
+  return <BattleMapView campaignId={campaignId} />;
+}
 type Theme = "dark" | "light";
 
 const ACTIVE_CAMPAIGN_KEY = "activeCampaignId";
@@ -91,6 +97,9 @@ function DmCampaignApp({
         <button className={tab === "handbook" ? "active" : ""} onClick={() => setTab("handbook")}>
           Handbook
         </button>
+        <button className={tab === "map" ? "active" : ""} onClick={() => setTab("map")}>
+          Map
+        </button>
         <button className={tab === "chat" ? "active" : ""} onClick={() => setTab("chat")}>
           Chat
         </button>
@@ -130,6 +139,11 @@ function DmCampaignApp({
       {tab === "handbook" && (
         <div className="app-content">
           <HandbookView />
+        </div>
+      )}
+      {tab === "map" && (
+        <div className="app-content">
+          <DmMapTab />
         </div>
       )}
       {tab === "chat" && <ChatView />}

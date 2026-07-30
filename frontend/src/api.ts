@@ -1,9 +1,12 @@
 import type {
+  ActiveMapState,
   AuthUser,
   Campaign,
   Character,
   CharacterSummary,
   CreatureSummary,
+  MapSummary,
+  MapToken,
   MyCharacterSummary,
   Module,
   NarrativeReference,
@@ -198,6 +201,53 @@ export async function listSrd(params: { category?: string; q?: string }): Promis
 export async function getSrdEntry(slug: string): Promise<SrdEntryDetail> {
   const res = await apiFetch(`/api/srd/${encodeURIComponent(slug)}`);
   return res.json();
+}
+
+// --- Battle maps ---
+
+export async function createMap(
+  campaignId: string,
+  map: { name: string; image_url: string; grid_size_px: number; width_px: number; height_px: number }
+): Promise<{ id: string }> {
+  return (await apiPost(`/api/campaigns/${encodeURIComponent(campaignId)}/maps`, map)).json();
+}
+
+export async function listMaps(campaignId: string): Promise<MapSummary[]> {
+  const data = (await (await apiFetch(`/api/campaigns/${encodeURIComponent(campaignId)}/maps`)).json()) as {
+    maps: MapSummary[];
+  };
+  return data.maps;
+}
+
+export async function setActiveMap(campaignId: string, mapId: string): Promise<void> {
+  await apiPost(`/api/campaigns/${encodeURIComponent(campaignId)}/active-map`, { map_id: mapId });
+}
+
+export async function getActiveMap(campaignId: string): Promise<ActiveMapState> {
+  const res = await apiFetch(`/api/campaigns/${encodeURIComponent(campaignId)}/active-map`);
+  return res.json();
+}
+
+export async function addToken(
+  campaignId: string,
+  token: Partial<MapToken> & { map_id: string; label: string }
+): Promise<{ id: string }> {
+  return (await apiPost(`/api/campaigns/${encodeURIComponent(campaignId)}/tokens`, token)).json();
+}
+
+export async function updateToken(tokenId: string, patch: Partial<MapToken>): Promise<void> {
+  await apiPatch(`/api/tokens/${encodeURIComponent(tokenId)}`, patch);
+}
+
+export async function deleteToken(tokenId: string): Promise<void> {
+  await apiDelete(`/api/tokens/${encodeURIComponent(tokenId)}`);
+}
+
+export async function toggleFogCell(mapId: string, cell: string, revealed: boolean): Promise<string[]> {
+  const data = (await (
+    await apiPost(`/api/maps/${encodeURIComponent(mapId)}/fog/toggle`, { cell, revealed })
+  ).json()) as { revealed_cells: string[] };
+  return data.revealed_cells;
 }
 
 export async function* streamChat(campaignId: string, message: string): AsyncGenerator<string> {

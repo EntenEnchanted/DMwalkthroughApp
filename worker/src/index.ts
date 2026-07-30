@@ -19,6 +19,16 @@ import {
   handleDeleteItem,
 } from "./routes/characters.js";
 import { handleListSrd, handleGetSrdEntry } from "./routes/srd.js";
+import {
+  handleCreateMap,
+  handleListMaps,
+  handleSetActiveMap,
+  handleGetActiveMap,
+  handleAddToken,
+  handleUpdateToken,
+  handleDeleteToken,
+  handleToggleFogCell,
+} from "./routes/maps.js";
 
 const ALLOWED_ORIGIN_SUFFIXES = [".dosi-dm-companion.pages.dev"];
 const ALLOWED_ORIGINS = new Set([
@@ -89,6 +99,16 @@ export default {
 
         if (sub === "invite" && request.method === "POST") {
           response = await handleGetOrCreateInvite(campaignId, request, env);
+        } else if (sub === "maps" && request.method === "POST") {
+          response = await handleCreateMap(campaignId, request, env);
+        } else if (sub === "maps" && request.method === "GET") {
+          response = await handleListMaps(campaignId, request, env);
+        } else if (sub === "active-map" && request.method === "POST") {
+          response = await handleSetActiveMap(campaignId, request, env);
+        } else if (sub === "active-map" && request.method === "GET") {
+          response = await handleGetActiveMap(campaignId, request, env);
+        } else if (sub === "tokens" && request.method === "POST") {
+          response = await handleAddToken(campaignId, request, env);
         } else if (sub === "outline" && request.method === "GET") {
           response = await handleGetCampaignOutline(campaignId, request, env);
         } else if (sub === "creatures" && request.method === "GET") {
@@ -128,6 +148,18 @@ export default {
           request.method === "PATCH"
             ? await handleUpdateItem(characterId, itemId, request, env)
             : await handleDeleteItem(characterId, itemId, request, env);
+      } else if (
+        /^\/api\/tokens\/[^/]+$/.test(pathname) &&
+        (request.method === "PATCH" || request.method === "DELETE")
+      ) {
+        const tokenId = pathname.split("/")[3];
+        response =
+          request.method === "PATCH"
+            ? await handleUpdateToken(tokenId, request, env)
+            : await handleDeleteToken(tokenId, request, env);
+      } else if (/^\/api\/maps\/[^/]+\/fog\/toggle$/.test(pathname) && request.method === "POST") {
+        const mapId = pathname.split("/")[3];
+        response = await handleToggleFogCell(mapId, request, env);
       } else {
         response = new Response("Not found", { status: 404 });
       }

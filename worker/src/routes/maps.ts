@@ -1,0 +1,311 @@
+import type { Env } from "../types.js";
+import { getSessionUser, type AuthUser } from "../auth.js";
+
+interface MapRow {
+  id: string;
+  campaign_id: string;
+  name: string;
+  image_url: string;
+  grid_size_px: number;
+  width_px: number;
+  height_px: number;
+}
+
+interface TokenRow {
+  id: string;
+  map_id: string;
+  character_id: string | null;
+  creature_section_id: string | null;
+  label: string;
+  x: number;
+  y: number;
+  size: number;
+  image_url: string | null;
+  color: string;
+  current_hp: number | null;
+  max_hp: number | null;
+}
+
+async function requireCampaignMember(
+  request: Request,
+  env: Env,
+  campaignId: string
+): Promise<{ user: AuthUser } | { error: Response }> {
+  const user = await getSessionUser(request, env);
+  if (!user) return { error: new Response("Unauthorized", { status: 401 }) };
+
+  if (user.role === "dm") {
+    const campaign = await env.DB.prepare(`SELECT dm_user_id FROM campaigns WHERE id = ?`)
+      .bind(campaignId)
+      .first<{ dm_user_id: string }>();
+    if (!campaign || campaign.dm_user_id !== user.id) return { error: new Response("Forbidden", { status: 403 }) };
+  } else {
+    const character = await env.DB.prepare(`SELECT id FROM characters WHERE campaign_id = ? AND player_user_id = ?`)
+      .bind(campaignId, user.id)
+      .first();
+    if (!character) return { error: new Response("Forbidden", { status: 403 }) };
+  }
+
+  return { user };
+}
+
+async function requireCampaignDm(
+  request: Request,
+  env: Env,
+  campaignId: string
+): Promise<{ user: AuthUser } | { error: Response }> {
+  const user = await getSessionUser(request, env);
+  if (!user) return { error: new Response("Unauthorized", { status: 401 }) };
+  if (user.role !== "dm") return { error: new Response("Forbidden", { status: 403 }) };
+
+  const campaign = await env.DB.prepare(`SELECT dm_user_id FROM campaigns WHERE id = ?`)
+    .bind(campaignId)
+    .first<{ dm_user_id: string }>();
+  if (!campaign || campaign.dm_user_id !== user.id) return { error: new Response("Forbidden", { status: 403 }) };
+
+  return { user };
+}
+
+export async function handleCreateMap(campaignId: string, request: Request, env: Env): Promise<Response> {
+  const result = await requireCampaignDm(request, env, campaignId);
+  if ("error" in result) return result.error;
+
+  const { name, image_url, grid_size_px, width_px, height_px } = (await request.json()) as {
+    name?: string;
+    image_url?: string;
+    grid_size_px?: number;
+    width_px?: number;
+    height_px?: number;
+  };
+  if (!name?.trim() || !image_url?.trim() || !width_px || !height_px) {
+    return new Response("Missing name, image_url, width_px, or height_px", { status: 400 });
+  }
+
+  const id = crypto.randomUUID();
+  await env.DB.prepare(
+    `INSERT INTO maps (id, campaign_id, name, image_url, grid_size_px, width_px, height_px, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+  )
+    .bind(id, campaignId, name.trim(), image_url.trim(), grid_size_px ?? 50, width_px, height_px, Date.now())
+    .run();
+
+  await env.DB.prepare(`INSERT INTO fog_state (map_id, revealed_cells_json) VALUES (?, '[]')`).bind(id).run();
+  await env.DB.prepare(`UPDATE campaigns SET active_map_id = ? WHERE id = ?`).bind(id, campaignId).run();
+
+  return Response.json({ id });
+}
+
+export async function handleListMaps(campaignId: string, request: Request, env: Env): Promise<Response> {
+  const result = await requireCampaignDm(request, env, campaignId);
+  if ("error" in result) return result.error;
+
+  const { results } = await env.DB.prepare(
+    `SELECT id, name, created_at FROM maps WHERE campaign_id = ? ORDER BY created_at DESC`
+  )
+    .bind(campaignId)
+    .all();
+  return Response.json({ maps: results });
+}
+
+export async function handleSetActiveMap(campaignId: string, request: Request, env: Env): Promise<Response> {
+  const result = await requireCampaignDm(request, env, campaignId);
+  if ("error" in result) return result.error;
+
+  const { map_id } = (await request.json()) as { map_id?: string };
+  if (!map_id) return new Response("Missing map_id", { status: 400 });
+
+  const map = await env.DB.prepare(`SELECT id FROM maps WHERE id = ? AND campaign_id = ?`)
+    .bind(map_id, campaignId)
+    .first();
+  if (!map) return new Response("Not found", { status: 404 });
+
+  await env.DB.prepare(`UPDATE campaigns SET active_map_id = ? WHERE id = ?`).bind(map_id, campaignId).run();
+  return Response.json({ ok: true });
+}
+
+export async function handleGetActiveMap(campaignId: string, request: Request, env: Env): Promise<Response> {
+  const result = await requireCampaignMember(request, env, campaignId);
+  if ("error" in result) return result.error;
+
+  const campaign = await env.DB.prepare(`SELECT active_map_id FROM campaigns WHERE id = ?`)
+    .bind(campaignId)
+    .first<{ active_map_id: string | null }>();
+  if (!campaign?.active_map_id) return Response.json({ map: null });
+
+  const map = await env.DB.prepare(`SELECT * FROM maps WHERE id = ?`).bind(campaign.active_map_id).first<MapRow>();
+  if (!map) return Response.json({ map: null });
+
+  const { results: tokens } = await env.DB.prepare(`SELECT * FROM tokens WHERE map_id = ?`)
+    .bind(map.id)
+    .all<TokenRow>();
+
+  const fog = await env.DB.prepare(`SELECT revealed_cells_json FROM fog_state WHERE map_id = ?`)
+    .bind(map.id)
+    .first<{ revealed_cells_json: string }>();
+
+  return Response.json({
+    map: {
+      id: map.id,
+      name: map.name,
+      image_url: map.image_url,
+      grid_size_px: map.grid_size_px,
+      width_px: map.width_px,
+      height_px: map.height_px,
+    },
+    tokens: tokens.map((t) => ({ ...t, character_id: t.character_id ?? undefined })),
+    revealed_cells: JSON.parse(fog?.revealed_cells_json ?? "[]"),
+  });
+}
+
+export async function handleAddToken(campaignId: string, request: Request, env: Env): Promise<Response> {
+  const result = await requireCampaignDm(request, env, campaignId);
+  if ("error" in result) return result.error;
+
+  const body = (await request.json()) as {
+    map_id?: string;
+    character_id?: string;
+    creature_section_id?: string;
+    label?: string;
+    x?: number;
+    y?: number;
+    size?: number;
+    image_url?: string;
+    color?: string;
+    current_hp?: number;
+    max_hp?: number;
+  };
+  if (!body.map_id || !body.label?.trim()) return new Response("Missing map_id or label", { status: 400 });
+
+  const map = await env.DB.prepare(`SELECT id FROM maps WHERE id = ? AND campaign_id = ?`)
+    .bind(body.map_id, campaignId)
+    .first();
+  if (!map) return new Response("Not found", { status: 404 });
+
+  const id = crypto.randomUUID();
+  await env.DB.prepare(
+    `INSERT INTO tokens (id, map_id, character_id, creature_section_id, label, x, y, size, image_url, color, current_hp, max_hp)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  )
+    .bind(
+      id,
+      body.map_id,
+      body.character_id ?? null,
+      body.creature_section_id ?? null,
+      body.label.trim(),
+      body.x ?? 0,
+      body.y ?? 0,
+      body.size ?? 1,
+      body.image_url ?? null,
+      body.color ?? "#3b82f6",
+      body.current_hp ?? null,
+      body.max_hp ?? null
+    )
+    .run();
+
+  return Response.json({ id });
+}
+
+export async function handleUpdateToken(tokenId: string, request: Request, env: Env): Promise<Response> {
+  const user = await getSessionUser(request, env);
+  if (!user) return new Response("Unauthorized", { status: 401 });
+
+  const token = await env.DB.prepare(`SELECT * FROM tokens WHERE id = ?`).bind(tokenId).first<TokenRow>();
+  if (!token) return new Response("Not found", { status: 404 });
+
+  const map = await env.DB.prepare(`SELECT campaign_id FROM maps WHERE id = ?`)
+    .bind(token.map_id)
+    .first<{ campaign_id: string }>();
+  if (!map) return new Response("Not found", { status: 404 });
+
+  const body = (await request.json()) as Partial<TokenRow>;
+
+  if (user.role === "dm") {
+    const campaign = await env.DB.prepare(`SELECT dm_user_id FROM campaigns WHERE id = ?`)
+      .bind(map.campaign_id)
+      .first<{ dm_user_id: string }>();
+    if (!campaign || campaign.dm_user_id !== user.id) return new Response("Forbidden", { status: 403 });
+
+    const updates: string[] = [];
+    const values: unknown[] = [];
+    for (const field of ["label", "x", "y", "size", "image_url", "color", "current_hp", "max_hp"] as const) {
+      if (field in body) {
+        updates.push(`${field} = ?`);
+        values.push(body[field]);
+      }
+    }
+    if (updates.length > 0) {
+      await env.DB.prepare(`UPDATE tokens SET ${updates.join(", ")} WHERE id = ?`)
+        .bind(...values, tokenId)
+        .run();
+    }
+    return Response.json({ ok: true });
+  }
+
+  // Players may only move their own character's token — x/y only.
+  if (!token.character_id) return new Response("Forbidden", { status: 403 });
+  const character = await env.DB.prepare(`SELECT player_user_id FROM characters WHERE id = ?`)
+    .bind(token.character_id)
+    .first<{ player_user_id: string }>();
+  if (!character || character.player_user_id !== user.id) return new Response("Forbidden", { status: 403 });
+
+  if (body.x === undefined && body.y === undefined) return Response.json({ ok: true });
+  await env.DB.prepare(`UPDATE tokens SET x = ?, y = ? WHERE id = ?`)
+    .bind(body.x ?? token.x, body.y ?? token.y, tokenId)
+    .run();
+  return Response.json({ ok: true });
+}
+
+export async function handleDeleteToken(tokenId: string, request: Request, env: Env): Promise<Response> {
+  const user = await getSessionUser(request, env);
+  if (!user) return new Response("Unauthorized", { status: 401 });
+  if (user.role !== "dm") return new Response("Forbidden", { status: 403 });
+
+  const token = await env.DB.prepare(
+    `SELECT t.id, m.campaign_id FROM tokens t JOIN maps m ON m.id = t.map_id WHERE t.id = ?`
+  )
+    .bind(tokenId)
+    .first<{ id: string; campaign_id: string }>();
+  if (!token) return new Response("Not found", { status: 404 });
+
+  const campaign = await env.DB.prepare(`SELECT dm_user_id FROM campaigns WHERE id = ?`)
+    .bind(token.campaign_id)
+    .first<{ dm_user_id: string }>();
+  if (!campaign || campaign.dm_user_id !== user.id) return new Response("Forbidden", { status: 403 });
+
+  await env.DB.prepare(`DELETE FROM tokens WHERE id = ?`).bind(tokenId).run();
+  return Response.json({ ok: true });
+}
+
+export async function handleToggleFogCell(mapId: string, request: Request, env: Env): Promise<Response> {
+  const user = await getSessionUser(request, env);
+  if (!user) return new Response("Unauthorized", { status: 401 });
+  if (user.role !== "dm") return new Response("Forbidden", { status: 403 });
+
+  const map = await env.DB.prepare(`SELECT campaign_id FROM maps WHERE id = ?`)
+    .bind(mapId)
+    .first<{ campaign_id: string }>();
+  if (!map) return new Response("Not found", { status: 404 });
+
+  const campaign = await env.DB.prepare(`SELECT dm_user_id FROM campaigns WHERE id = ?`)
+    .bind(map.campaign_id)
+    .first<{ dm_user_id: string }>();
+  if (!campaign || campaign.dm_user_id !== user.id) return new Response("Forbidden", { status: 403 });
+
+  const { cell, revealed } = (await request.json()) as { cell?: string; revealed?: boolean };
+  if (!cell) return new Response("Missing cell", { status: 400 });
+
+  const fog = await env.DB.prepare(`SELECT revealed_cells_json FROM fog_state WHERE map_id = ?`)
+    .bind(mapId)
+    .first<{ revealed_cells_json: string }>();
+  const cells: string[] = JSON.parse(fog?.revealed_cells_json ?? "[]");
+  const next = revealed ? Array.from(new Set([...cells, cell])) : cells.filter((c) => c !== cell);
+
+  await env.DB.prepare(
+    `INSERT INTO fog_state (map_id, revealed_cells_json) VALUES (?, ?)
+     ON CONFLICT(map_id) DO UPDATE SET revealed_cells_json=excluded.revealed_cells_json`
+  )
+    .bind(mapId, JSON.stringify(next))
+    .run();
+
+  return Response.json({ ok: true, revealed_cells: next });
+}
