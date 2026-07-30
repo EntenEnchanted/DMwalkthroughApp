@@ -9,6 +9,8 @@ import type {
   NarrativeReference,
   SearchResult,
   SectionDetail,
+  SrdEntryDetail,
+  SrdEntrySummary,
 } from "./types";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8787";
@@ -180,6 +182,22 @@ export async function updateCharacterItem(
 
 export async function deleteCharacterItem(characterId: string, itemId: string): Promise<void> {
   await apiDelete(`/api/characters/${encodeURIComponent(characterId)}/items/${encodeURIComponent(itemId)}`);
+}
+
+// --- SRD / Handbook (not campaign-scoped, either role) ---
+
+export async function listSrd(params: { category?: string; q?: string }): Promise<SrdEntrySummary[]> {
+  const search = new URLSearchParams();
+  if (params.category) search.set("category", params.category);
+  if (params.q) search.set("q", params.q);
+  const res = await apiFetch(`/api/srd?${search.toString()}`);
+  const data = (await res.json()) as { entries: SrdEntrySummary[] };
+  return data.entries;
+}
+
+export async function getSrdEntry(slug: string): Promise<SrdEntryDetail> {
+  const res = await apiFetch(`/api/srd/${encodeURIComponent(slug)}`);
+  return res.json();
 }
 
 export async function* streamChat(campaignId: string, message: string): AsyncGenerator<string> {

@@ -18,6 +18,7 @@ import {
   handleUpdateItem,
   handleDeleteItem,
 } from "./routes/characters.js";
+import { handleListSrd, handleGetSrdEntry } from "./routes/srd.js";
 
 const ALLOWED_ORIGIN_SUFFIXES = [".dosi-dm-companion.pages.dev"];
 const ALLOWED_ORIGINS = new Set([
@@ -75,6 +76,10 @@ export default {
         response = await handleLoadSections(request, env);
       } else if (pathname === "/api/me/characters" && request.method === "GET") {
         response = await handleListMyCharacters(request, env);
+      } else if (pathname === "/api/srd" && request.method === "GET") {
+        response = await handleListSrd(request, env);
+      } else if (/^\/api\/srd\/[^/]+$/.test(pathname) && request.method === "GET") {
+        response = await handleGetSrdEntry(pathname.split("/")[3], request, env);
       } else if (campaignSubMatch) {
         const campaignId = campaignSubMatch[1];
         const sub = campaignSubMatch[2];

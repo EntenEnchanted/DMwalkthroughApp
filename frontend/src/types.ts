@@ -150,3 +150,22 @@ export interface MyCharacterSummary {
   campaign_id: string;
   campaign_name: string;
 }
+
+export type SrdCategory = "class" | "race" | "spell" | "equipment" | "feat" | "condition" | "rule";
+
+export interface SrdEntrySummary {
+  id: string;
+  category: SrdCategory;
+  name: string;
+  slug: string;
+}
+
+export interface SrdEntryDetail {
+  category: SrdCategory;
+  name: string;
+  slug: string;
+  source: string;
+  // Raw upstream shape from the SRD dataset — varies by category, so this
+  // stays loosely typed and is rendered defensively (see HandbookView).
+  data: Record<string, unknown>;
+}

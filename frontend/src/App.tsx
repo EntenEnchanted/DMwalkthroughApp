@@ -10,8 +10,9 @@ import { RosterView } from "./components/RosterView";
 import { LoginView } from "./components/LoginView";
 import { CampaignPickerView } from "./components/CampaignPickerView";
 import { PlayerHomeView } from "./components/PlayerHomeView";
+import { HandbookView } from "./components/HandbookView";
 
-type Tab = "campaign" | "search" | "bestiary" | "roster" | "chat";
+type Tab = "campaign" | "search" | "bestiary" | "roster" | "handbook" | "chat";
 type Theme = "dark" | "light";
 
 const ACTIVE_CAMPAIGN_KEY = "activeCampaignId";
@@ -87,6 +88,9 @@ function DmCampaignApp({
         <button className={tab === "roster" ? "active" : ""} onClick={() => setTab("roster")}>
           Roster
         </button>
+        <button className={tab === "handbook" ? "active" : ""} onClick={() => setTab("handbook")}>
+          Handbook
+        </button>
         <button className={tab === "chat" ? "active" : ""} onClick={() => setTab("chat")}>
           Chat
         </button>
@@ -121,6 +125,11 @@ function DmCampaignApp({
       {tab === "roster" && (
         <div className="app-content">
           <RosterView />
+        </div>
+      )}
+      {tab === "handbook" && (
+        <div className="app-content">
+          <HandbookView />
         </div>
       )}
       {tab === "chat" && <ChatView />}

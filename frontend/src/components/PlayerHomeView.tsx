@@ -3,9 +3,13 @@ import { useAuth } from "../AuthContext";
 import { listMyCharacters } from "../api";
 import type { MyCharacterSummary } from "../types";
 import { CharacterSheetView } from "./CharacterSheetView";
+import { HandbookView } from "./HandbookView";
+
+type View = "sheet" | "handbook";
 
 export function PlayerHomeView() {
   const { logout } = useAuth();
+  const [view, setView] = useState<View>("sheet");
   const [characters, setCharacters] = useState<MyCharacterSummary[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -18,28 +22,23 @@ export function PlayerHomeView() {
 
   if (!characters) return <div className="empty-state">Loading…</div>;
 
-  if (characters.length === 0) {
-    return (
-      <div className="picker-screen">
-        <div className="picker-header">
-          <h1>No characters yet</h1>
-          <button className="link-button" onClick={() => logout()}>
-            Log out
-          </button>
-        </div>
-        <div className="empty-state">Ask your DM for an invite code to join a campaign.</div>
-      </div>
-    );
-  }
-
   const selected = characters.find((c) => c.id === selectedId);
 
   return (
     <div className="picker-screen">
       <div className="picker-header">
-        <h1>{selected ? selected.name : "Your Characters"}</h1>
+        <h1>{view === "handbook" ? "Handbook" : selected ? selected.name : "Your Characters"}</h1>
         <div>
-          {characters.length > 1 && selected && (
+          <button className={view === "sheet" ? "link-button active" : "link-button"} onClick={() => setView("sheet")}>
+            My Character
+          </button>
+          <button
+            className={view === "handbook" ? "link-button active" : "link-button"}
+            onClick={() => setView("handbook")}
+          >
+            Handbook
+          </button>
+          {view === "sheet" && characters.length > 1 && selected && (
             <button className="link-button" onClick={() => setSelectedId(null)}>
               Switch character
             </button>
@@ -50,7 +49,13 @@ export function PlayerHomeView() {
         </div>
       </div>
 
-      {!selected && (
+      {view === "handbook" && <HandbookView />}
+
+      {view === "sheet" && characters.length === 0 && (
+        <div className="empty-state">Ask your DM for an invite code to join a campaign.</div>
+      )}
+
+      {view === "sheet" && !selected && characters.length > 0 && (
         <div className="campaign-list">
           {characters.map((c) => (
             <button key={c.id} className="campaign-card-main campaign-card" onClick={() => setSelectedId(c.id)}>
@@ -61,7 +66,7 @@ export function PlayerHomeView() {
         </div>
       )}
 
-      {selected && <CharacterSheetView characterId={selected.id} />}
+      {view === "sheet" && selected && <CharacterSheetView characterId={selected.id} />}
     </div>
   );
 }
