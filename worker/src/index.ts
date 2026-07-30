@@ -3,7 +3,7 @@ import { handleSearch } from "./routes/search.js";
 import { handleChat } from "./routes/chat.js";
 import { handleGetSection, handleGetNarrativeReferences } from "./routes/sections.js";
 import { handleToggleReveal } from "./routes/reveals.js";
-import { handleLoadSections } from "./routes/admin.js";
+import { handleLoadSections, handleClassifySection } from "./routes/admin.js";
 import { handleGetCampaignOutline } from "./routes/campaign.js";
 import { handleGetCreatures } from "./routes/creatures.js";
 import { handleLogin, handleLogout, handleMe } from "./routes/auth.js";
@@ -103,6 +103,8 @@ export default {
         response = await handleCreateCampaign(request, env);
       } else if (pathname === "/admin/load-sections" && request.method === "POST") {
         response = await handleLoadSections(request, env);
+      } else if (pathname === "/admin/classify" && request.method === "POST") {
+        response = await handleClassifySection(request, env);
       } else if (pathname === "/api/me/characters" && request.method === "GET") {
         response = await handleListMyCharacters(request, env);
       } else if (pathname === "/api/srd" && request.method === "GET") {

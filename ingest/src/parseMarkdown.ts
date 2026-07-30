@@ -87,11 +87,17 @@ export function extractItemNames(sections: ParsedSection[], filePath: string): s
     .filter((x): x is string => Boolean(x));
 }
 
-export function chapterNumber(chapter: string): number {
-  const m = /^Chapter (\d+):/.exec(chapter);
-  if (m) return Number(m[1]);
-  if (chapter === "Running the Adventure") return 0;
-  if (chapter.startsWith("Appendix A")) return 5;
-  if (chapter.startsWith("Appendix B")) return 6;
-  return 99;
+// Chapter numbering by parsed first-appearance order, not by parsing title
+// text — different modules use different chapter-naming conventions (DoSI:
+// "Chapter 1: Dragon's Rest"; Lost Mine of Phandelver: plain titles like
+// "Goblin Arrows" with no "Chapter N:" prefix at all). This is verified
+// equivalent to the old text-parsing scheme for DoSI's actual chapters
+// (Running the Adventure=0, Chapter 1-4=1-4, Appendix A=5, Appendix B=6),
+// so dosi's existing ids are unaffected.
+export function buildChapterIndex(sections: ParsedSection[]): (chapter: string) => number {
+  const order = new Map<string, number>();
+  for (const s of sections) {
+    if (!order.has(s.chapter)) order.set(s.chapter, order.size);
+  }
+  return (chapter: string) => order.get(chapter) ?? 99;
 }

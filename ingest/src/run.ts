@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { writeFileSync, mkdirSync } from "node:fs";
-import { parseMarkdown, extractItemNames, chapterNumber } from "./parseMarkdown.js";
+import { parseMarkdown, extractItemNames, buildChapterIndex } from "./parseMarkdown.js";
 import { classifySection } from "./classify.js";
 import { buildCreatureSections } from "./buildCreatureSections.js";
 import { buildItemSections } from "./buildItemSections.js";
@@ -84,6 +84,7 @@ async function main() {
   const creatureNames = creatureSections.map((c) => c.stat_block ? (c.stat_block as { name: string }).name : "");
 
   const allParsed = parseMarkdown(mdPath);
+  const chapterIndex = buildChapterIndex(allParsed);
 
   if (creaturesOnly) {
     const itemNames = extractItemNames(allParsed, mdPath);
@@ -107,7 +108,7 @@ async function main() {
   }
 
   const parsed =
-    chapterFilter === "all" ? allParsed : allParsed.filter((s) => String(chapterNumber(s.chapter)) === chapterFilter);
+    chapterFilter === "all" ? allParsed : allParsed.filter((s) => String(chapterIndex(s.chapter)) === chapterFilter);
 
   console.log(`Classifying ${parsed.length} sections (module: ${moduleId}, chapter filter: ${chapterFilter})...`);
 
@@ -122,7 +123,7 @@ async function main() {
       .filter((x): x is string => Boolean(x));
 
     classified.push({
-      id: id(String(chapterNumber(section.chapter)), section.title),
+      id: id(String(chapterIndex(section.chapter)), section.title),
       module_id: moduleId,
       chapter: section.chapter,
       heading: section.title,
