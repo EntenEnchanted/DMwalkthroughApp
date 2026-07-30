@@ -18,6 +18,7 @@ export interface Reveal {
 
 export interface IngestSection {
   id: string;
+  module_id: string;
   chapter: string;
   heading: string;
   heading_path: string[];

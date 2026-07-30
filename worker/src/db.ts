@@ -4,15 +4,16 @@ export async function upsertSection(env: Env, section: IngestSection): Promise<v
   const db = env.DB;
   await db
     .prepare(
-      `INSERT INTO sections (id, chapter, heading, heading_path, "order", type, dm_only_text, read_aloud_text)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO sections (id, module_id, chapter, heading, heading_path, "order", type, dm_only_text, read_aloud_text)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET
-         chapter=excluded.chapter, heading=excluded.heading, heading_path=excluded.heading_path,
-         "order"=excluded."order", type=excluded.type, dm_only_text=excluded.dm_only_text,
-         read_aloud_text=excluded.read_aloud_text`
+         module_id=excluded.module_id, chapter=excluded.chapter, heading=excluded.heading,
+         heading_path=excluded.heading_path, "order"=excluded."order", type=excluded.type,
+         dm_only_text=excluded.dm_only_text, read_aloud_text=excluded.read_aloud_text`
     )
     .bind(
       section.id,
+      section.module_id,
       section.chapter,
       section.heading,
       JSON.stringify(section.heading_path),

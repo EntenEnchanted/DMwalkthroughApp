@@ -7,12 +7,11 @@ import { buildItemSections } from "./buildItemSections.js";
 import { slugify } from "./slugify.js";
 import type { SectionType, Reveal } from "./types.js";
 
-const MD_PATH = "../Dragons of Stormwreck Isle.md";
-const SEED_PATH = "../dosi-creatures-seed.json";
 const OUTPUT_DIR = "./output";
 
 export interface FinalSection {
   id: string;
+  module_id: string;
   chapter: string;
   heading: string;
   heading_path: string[];
@@ -29,7 +28,17 @@ function parseArgs() {
   const arg = process.argv.find((a) => a.startsWith("--chapter="));
   const chapterFilter = arg ? arg.split("=")[1] : "all";
   const creaturesOnly = process.argv.includes("--creatures-only");
-  return { chapterFilter, creaturesOnly };
+
+  const moduleArg = process.argv.find((a) => a.startsWith("--module="));
+  const moduleId = moduleArg ? moduleArg.split("=")[1] : "dosi";
+
+  const sourceArg = process.argv.find((a) => a.startsWith("--source="));
+  const mdPath = sourceArg ? sourceArg.split("=")[1] : "../Dragons of Stormwreck Isle.md";
+
+  const seedArg = process.argv.find((a) => a.startsWith("--creatures-seed="));
+  const seedPath = seedArg ? seedArg.split("=")[1] : "../dosi-creatures-seed.json";
+
+  return { chapterFilter, creaturesOnly, moduleId, mdPath, seedPath };
 }
 
 async function loadIntoWorker(output: unknown[]) {
@@ -49,11 +58,18 @@ async function loadIntoWorker(output: unknown[]) {
 }
 
 async function main() {
-  const { chapterFilter, creaturesOnly } = parseArgs();
+  const { chapterFilter, creaturesOnly, moduleId, mdPath, seedPath } = parseArgs();
   mkdirSync(OUTPUT_DIR, { recursive: true });
 
-  const creatureSections = buildCreatureSections(SEED_PATH).map((c, i) => ({
-    id: slugify("creature", c.title),
+  // Section ids are a global primary key across every module. `dosi` keeps
+  // its existing unprefixed scheme byte-for-byte (156 rows are already live
+  // under those ids) — only new modules get a slug prefix, to keep ids
+  // unique cross-module without touching anything already ingested.
+  const id = (...parts: string[]) => (moduleId === "dosi" ? slugify(...parts) : slugify(moduleId, ...parts));
+
+  const creatureSections = buildCreatureSections(seedPath).map((c, i) => ({
+    id: id("creature", c.title),
+    module_id: moduleId,
     chapter: c.chapter,
     heading: c.title,
     heading_path: c.headingPath,
@@ -67,12 +83,13 @@ async function main() {
   }));
   const creatureNames = creatureSections.map((c) => c.stat_block ? (c.stat_block as { name: string }).name : "");
 
-  const allParsed = parseMarkdown(MD_PATH);
+  const allParsed = parseMarkdown(mdPath);
 
   if (creaturesOnly) {
-    const itemNames = extractItemNames(allParsed, MD_PATH);
+    const itemNames = extractItemNames(allParsed, mdPath);
     const itemSections = buildItemSections(itemNames).map((it, i) => ({
-      id: slugify("item", it.title),
+      id: id("item", it.title),
+      module_id: moduleId,
       chapter: it.chapter,
       heading: it.title,
       heading_path: it.headingPath,
@@ -84,7 +101,7 @@ async function main() {
       references: [] as string[],
     }));
     const output = [...creatureSections, ...itemSections];
-    writeFileSync(`${OUTPUT_DIR}/creatures-items.json`, JSON.stringify(output, null, 2));
+    writeFileSync(`${OUTPUT_DIR}/${moduleId}-creatures-items.json`, JSON.stringify(output, null, 2));
     await loadIntoWorker(output);
     return;
   }
@@ -92,7 +109,7 @@ async function main() {
   const parsed =
     chapterFilter === "all" ? allParsed : allParsed.filter((s) => String(chapterNumber(s.chapter)) === chapterFilter);
 
-  console.log(`Classifying ${parsed.length} sections (chapter filter: ${chapterFilter})...`);
+  console.log(`Classifying ${parsed.length} sections (module: ${moduleId}, chapter filter: ${chapterFilter})...`);
 
   const classified: FinalSection[] = [];
   for (const section of parsed) {
@@ -105,7 +122,8 @@ async function main() {
       .filter((x): x is string => Boolean(x));
 
     classified.push({
-      id: slugify(String(chapterNumber(section.chapter)), section.title),
+      id: id(String(chapterNumber(section.chapter)), section.title),
+      module_id: moduleId,
       chapter: section.chapter,
       heading: section.title,
       heading_path: section.headingPath,
@@ -121,9 +139,10 @@ async function main() {
   const output: FinalSection[] = [...classified];
   if (chapterFilter === "all") {
     output.push(...creatureSections);
-    const itemNames = extractItemNames(allParsed, MD_PATH);
+    const itemNames = extractItemNames(allParsed, mdPath);
     const itemSections = buildItemSections(itemNames).map((it, i) => ({
-      id: slugify("item", it.title),
+      id: id("item", it.title),
+      module_id: moduleId,
       chapter: it.chapter,
       heading: it.title,
       heading_path: it.headingPath,
@@ -137,7 +156,7 @@ async function main() {
     output.push(...itemSections);
   }
 
-  const outPath = `${OUTPUT_DIR}/chapter-${chapterFilter}.json`;
+  const outPath = `${OUTPUT_DIR}/${moduleId}-chapter-${chapterFilter}.json`;
   writeFileSync(outPath, JSON.stringify(output, null, 2));
   console.log(`\nWrote ${output.length} sections to ${outPath}`);
 
