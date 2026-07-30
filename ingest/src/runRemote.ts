@@ -155,6 +155,21 @@ async function main() {
     classified.push(...prior);
     for (const s of prior) doneOrders.add(s.order);
     console.log(`Resuming: ${prior.length} sections already classified, skipping them.`);
+
+    // The checkpoint is written per-section, but D1 loads happen in
+    // batches — a crash between a checkpoint write and its batch flush
+    // (exactly what happened here: a billing error mid-batch) leaves
+    // sections marked "done" that were never actually persisted, and
+    // resuming would otherwise skip them forever. Re-flushing every
+    // checkpointed section is wasted work but harmless (upsertSection is
+    // ON CONFLICT DO UPDATE), so just always do it rather than trying to
+    // detect the gap.
+    if (!skipLoad) {
+      console.log(`Re-flushing all ${prior.length} checkpointed sections to close any partial-batch gap...`);
+      for (let i = 0; i < prior.length; i += LOAD_BATCH_SIZE) {
+        await loadIntoWorker(prior.slice(i, i + LOAD_BATCH_SIZE));
+      }
+    }
   }
 
   const toClassify = allParsed.filter((s) => !doneOrders.has(s.order));
