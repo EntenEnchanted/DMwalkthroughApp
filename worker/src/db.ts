@@ -23,10 +23,10 @@ export async function upsertSection(env: Env, section: IngestSection): Promise<v
     )
     .run();
 
-  await db.prepare(`DELETE FROM reveals WHERE section_id = ?`).bind(section.id).run();
+  await db.prepare(`DELETE FROM reveal_defs WHERE section_id = ?`).bind(section.id).run();
   for (const r of section.reveals) {
     await db
-      .prepare(`INSERT INTO reveals (section_id, trigger_skill, trigger_dc, text, revealed) VALUES (?, ?, ?, ?, 0)`)
+      .prepare(`INSERT INTO reveal_defs (section_id, trigger_skill, trigger_dc, text) VALUES (?, ?, ?, ?)`)
       .bind(section.id, r.trigger_skill, r.trigger_dc, r.text)
       .run();
   }
@@ -54,23 +54,24 @@ export function embeddingText(section: Pick<IngestSection, "dm_only_text" | "rea
   return [section.heading, section.read_aloud_text, section.dm_only_text].filter(Boolean).join("\n\n");
 }
 
-export async function getSectionsByIds(env: Env, ids: string[]): Promise<SectionRow[]> {
-  if (ids.length === 0) return [];
-  const placeholders = ids.map(() => "?").join(",");
-  const { results } = await env.DB.prepare(`SELECT * FROM sections WHERE id IN (${placeholders})`)
-    .bind(...ids)
-    .all<SectionRow>();
-  return results;
-}
-
-export async function getSectionDetail(env: Env, id: string): Promise<SectionDetail | null> {
-  const section = await env.DB.prepare(`SELECT * FROM sections WHERE id = ?`).bind(id).first<SectionRow>();
+export async function getSectionDetail(
+  env: Env,
+  campaignId: string,
+  moduleId: string,
+  id: string
+): Promise<SectionDetail | null> {
+  const section = await env.DB.prepare(`SELECT * FROM sections WHERE id = ? AND module_id = ?`)
+    .bind(id, moduleId)
+    .first<SectionRow>();
   if (!section) return null;
 
   const { results: reveals } = await env.DB.prepare(
-    `SELECT id, trigger_skill, trigger_dc, text, revealed FROM reveals WHERE section_id = ?`
+    `SELECT rd.id, rd.trigger_skill, rd.trigger_dc, rd.text, COALESCE(crs.revealed, 0) as revealed
+     FROM reveal_defs rd
+     LEFT JOIN campaign_reveal_state crs ON crs.reveal_def_id = rd.id AND crs.campaign_id = ?
+     WHERE rd.section_id = ?`
   )
-    .bind(id)
+    .bind(campaignId, id)
     .all<{ id: number; trigger_skill: string; trigger_dc: number; text: string; revealed: number }>();
 
   const statBlockRow = await env.DB.prepare(`SELECT stat_block_json FROM creature_stats WHERE section_id = ?`)
@@ -99,24 +100,32 @@ export async function getSectionDetail(env: Env, id: string): Promise<SectionDet
   };
 }
 
-export async function getCampaignSections(env: Env): Promise<SectionDetail[]> {
+export async function getCampaignSections(env: Env, campaignId: string, moduleId: string): Promise<SectionDetail[]> {
   const { results: sections } = await env.DB.prepare(
-    `SELECT * FROM sections WHERE type != 'creature' AND type != 'item' ORDER BY "order" ASC`
-  ).all<SectionRow>();
+    `SELECT * FROM sections WHERE module_id = ? AND type != 'creature' AND type != 'item' ORDER BY "order" ASC`
+  )
+    .bind(moduleId)
+    .all<SectionRow>();
   if (sections.length === 0) return [];
 
   const { results: allReveals } = await env.DB.prepare(
-    `SELECT r.id, r.section_id, r.trigger_skill, r.trigger_dc, r.text, r.revealed FROM reveals r
-     JOIN sections s ON s.id = r.section_id
-     WHERE s.type != 'creature' AND s.type != 'item'`
-  ).all<{ id: number; section_id: string; trigger_skill: string; trigger_dc: number; text: string; revealed: number }>();
+    `SELECT rd.id, rd.section_id, rd.trigger_skill, rd.trigger_dc, rd.text, COALESCE(crs.revealed, 0) as revealed
+     FROM reveal_defs rd
+     JOIN sections s ON s.id = rd.section_id
+     LEFT JOIN campaign_reveal_state crs ON crs.reveal_def_id = rd.id AND crs.campaign_id = ?
+     WHERE s.module_id = ? AND s.type != 'creature' AND s.type != 'item'`
+  )
+    .bind(campaignId, moduleId)
+    .all<{ id: number; section_id: string; trigger_skill: string; trigger_dc: number; text: string; revealed: number }>();
 
   const { results: allReferences } = await env.DB.prepare(
     `SELECT sr.source_section_id, ref.id, ref.heading, ref.type FROM section_references sr
      JOIN sections src ON src.id = sr.source_section_id
      JOIN sections ref ON ref.id = sr.referenced_section_id
-     WHERE src.type != 'creature' AND src.type != 'item'`
-  ).all<{ source_section_id: string; id: string; heading: string; type: SectionType }>();
+     WHERE src.module_id = ? AND src.type != 'creature' AND src.type != 'item'`
+  )
+    .bind(moduleId)
+    .all<{ source_section_id: string; id: string; heading: string; type: SectionType }>();
 
   const revealsBySection = new Map<string, Reveal[]>();
   for (const r of allReveals) {
@@ -146,26 +155,40 @@ export async function getCampaignSections(env: Env): Promise<SectionDetail[]> {
   }));
 }
 
-export async function getCreatureSections(env: Env): Promise<{ id: string; heading: string; chapter: string }[]> {
+export async function getCreatureSections(
+  env: Env,
+  moduleId: string
+): Promise<{ id: string; heading: string; chapter: string }[]> {
   const { results } = await env.DB.prepare(
-    `SELECT id, heading, chapter FROM sections WHERE type = 'creature' ORDER BY heading ASC`
-  ).all<{ id: string; heading: string; chapter: string }>();
+    `SELECT id, heading, chapter FROM sections WHERE type = 'creature' AND module_id = ? ORDER BY heading ASC`
+  )
+    .bind(moduleId)
+    .all<{ id: string; heading: string; chapter: string }>();
   return results;
 }
 
-export async function getNarrativeReferencesTo(env: Env, creatureSectionId: string) {
+export async function getNarrativeReferencesTo(env: Env, moduleId: string, creatureSectionId: string) {
   const { results } = await env.DB.prepare(
     `SELECT s.id, s.heading, s.chapter, s.dm_only_text, s.read_aloud_text FROM section_references sr
      JOIN sections s ON s.id = sr.source_section_id
-     WHERE sr.referenced_section_id = ?`
+     WHERE sr.referenced_section_id = ? AND s.module_id = ?`
   )
-    .bind(creatureSectionId)
+    .bind(creatureSectionId, moduleId)
     .all<{ id: string; heading: string; chapter: string; dm_only_text: string; read_aloud_text: string }>();
   return results;
 }
 
-export async function toggleReveal(env: Env, revealId: number, revealed: boolean): Promise<void> {
-  await env.DB.prepare(`UPDATE reveals SET revealed = ? WHERE id = ?`)
-    .bind(revealed ? 1 : 0, revealId)
+export async function toggleReveal(
+  env: Env,
+  campaignId: string,
+  revealDefId: number,
+  revealed: boolean
+): Promise<void> {
+  await env.DB.prepare(
+    `INSERT INTO campaign_reveal_state (campaign_id, reveal_def_id, revealed, revealed_at)
+     VALUES (?, ?, ?, ?)
+     ON CONFLICT(campaign_id, reveal_def_id) DO UPDATE SET revealed=excluded.revealed, revealed_at=excluded.revealed_at`
+  )
+    .bind(campaignId, revealDefId, revealed ? 1 : 0, revealed ? Date.now() : null)
     .run();
 }

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { streamChat } from "../api";
+import { useCampaignId } from "../CampaignContext";
 
 interface Message {
   role: "user" | "assistant";
@@ -7,6 +8,7 @@ interface Message {
 }
 
 export function ChatView() {
+  const campaignId = useCampaignId();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -27,7 +29,7 @@ export function ChatView() {
     scrollToBottom();
 
     try {
-      for await (const chunk of streamChat(question)) {
+      for await (const chunk of streamChat(campaignId, question)) {
         setMessages((prev) => {
           const next = [...prev];
           next[next.length - 1] = { role: "assistant", text: next[next.length - 1].text + chunk };

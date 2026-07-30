@@ -2,8 +2,10 @@ import { useState } from "react";
 import { search } from "../api";
 import type { SearchResult } from "../types";
 import { SectionCard } from "./SectionCard";
+import { useCampaignId } from "../CampaignContext";
 
 export function SearchView() {
+  const campaignId = useCampaignId();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -18,7 +20,7 @@ export function SearchView() {
     }
     setLoading(true);
     try {
-      const r = await search(q);
+      const r = await search(campaignId, q);
       setResults(r);
       setSearched(true);
     } finally {

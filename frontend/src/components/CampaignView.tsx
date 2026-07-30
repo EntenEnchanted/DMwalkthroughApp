@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { getCampaign } from "../api";
+import { getCampaignOutline } from "../api";
 import type { SectionDetail } from "../types";
 import { SectionCard } from "./SectionCard";
+import { useCampaignId } from "../CampaignContext";
 
 interface Chapter {
   chapter: string;
@@ -22,13 +23,14 @@ function groupByChapter(sections: SectionDetail[]): Chapter[] {
 }
 
 export function CampaignView() {
+  const campaignId = useCampaignId();
   const [chapters, setChapters] = useState<Chapter[] | null>(null);
   const [closedChapters, setClosedChapters] = useState<Set<string>>(new Set());
   const [closedSections, setClosedSections] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    getCampaign().then((sections) => setChapters(groupByChapter(sections)));
-  }, []);
+    getCampaignOutline(campaignId).then((sections) => setChapters(groupByChapter(sections)));
+  }, [campaignId]);
 
   function toggleChapter(chapter: string) {
     setClosedChapters((prev) => {

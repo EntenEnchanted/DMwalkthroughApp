@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { getNarrativeReferences, getSection } from "../api";
 import type { CreatureStatBlock, NarrativeReference, SectionDetail } from "../types";
 import { renderDmText } from "../dmText";
+import { useCampaignId } from "../CampaignContext";
 
 export function StatBlockPopup({ sectionId, onClose }: { sectionId: string; onClose: () => void }) {
+  const campaignId = useCampaignId();
   const [section, setSection] = useState<SectionDetail | null>(null);
   const [narrative, setNarrative] = useState<NarrativeReference[]>([]);
   const [tab, setTab] = useState<"stats" | "narrative">("stats");
@@ -12,9 +14,9 @@ export function StatBlockPopup({ sectionId, onClose }: { sectionId: string; onCl
     setSection(null);
     setNarrative([]);
     setTab("stats");
-    getSection(sectionId).then(setSection);
-    getNarrativeReferences(sectionId).then(setNarrative);
-  }, [sectionId]);
+    getSection(campaignId, sectionId).then(setSection);
+    getNarrativeReferences(campaignId, sectionId).then(setNarrative);
+  }, [campaignId, sectionId]);
 
   return (
     <div className="popup-overlay" onClick={onClose}>

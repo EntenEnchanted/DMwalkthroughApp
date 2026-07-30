@@ -1,13 +1,14 @@
 import type { Env } from "../types.js";
 import { embedOne } from "../embeddings.js";
 import { getSectionDetail } from "../db.js";
+import { requireCampaignDm } from "./campaigns.js";
 
 const TOP_N = 6;
 const MODEL = "claude-sonnet-5";
 
-const SYSTEM_PROMPT = `You are a Dungeon Master's companion for running the D&D 5e adventure "Dragons of \
-Stormwreck Isle". Answer the DM's question using ONLY the context sections provided below — never invent \
-rules, plot details, or stats not present in the context.
+const SYSTEM_PROMPT = `You are a Dungeon Master's companion for running a D&D 5e adventure. Answer the DM's \
+question using ONLY the context sections provided below — never invent rules, plot details, or stats not \
+present in the context.
 
 Every part of your answer must be explicitly labeled by tier:
 - "Read aloud:" for text meant to be read verbatim to players.
@@ -37,13 +38,18 @@ function formatContext(sections: Awaited<ReturnType<typeof getSectionDetail>>[])
     .join("\n\n");
 }
 
-export async function handleChat(request: Request, env: Env): Promise<Response> {
+export async function handleChat(campaignId: string, request: Request, env: Env): Promise<Response> {
+  const result = await requireCampaignDm(request, env, campaignId);
+  if ("error" in result) return result.error;
+
   const { message } = (await request.json()) as { message: string };
   if (!message?.trim()) return new Response("Missing message", { status: 400 });
 
   const vector = await embedOne(env, message);
   const matches = await env.VECTORIZE.query(vector, { topK: TOP_N });
-  const details = await Promise.all(matches.matches.map((m) => getSectionDetail(env, m.id)));
+  const details = await Promise.all(
+    matches.matches.map((m) => getSectionDetail(env, campaignId, result.campaign.module_id, m.id))
+  );
   const context = formatContext(details);
 
   const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", {

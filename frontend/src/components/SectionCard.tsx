@@ -3,14 +3,16 @@ import type { SectionDetail } from "../types";
 import { toggleReveal } from "../api";
 import { usePopup } from "../PopupContext";
 import { renderDmText } from "../dmText";
+import { useCampaignId } from "../CampaignContext";
 
 export function SectionCard({ section }: { section: SectionDetail }) {
+  const campaignId = useCampaignId();
   const [reveals, setReveals] = useState(section.reveals);
   const { openSection } = usePopup();
 
   async function handleToggle(revealId: number, next: boolean) {
     setReveals((prev) => prev.map((r) => (r.id === revealId ? { ...r, revealed: next } : r)));
-    await toggleReveal(revealId, next);
+    await toggleReveal(campaignId, revealId, next);
   }
 
   return (

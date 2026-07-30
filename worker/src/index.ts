@@ -4,17 +4,39 @@ import { handleChat } from "./routes/chat.js";
 import { handleGetSection, handleGetNarrativeReferences } from "./routes/sections.js";
 import { handleToggleReveal } from "./routes/reveals.js";
 import { handleLoadSections } from "./routes/admin.js";
-import { handleGetCampaign } from "./routes/campaign.js";
+import { handleGetCampaignOutline } from "./routes/campaign.js";
 import { handleGetCreatures } from "./routes/creatures.js";
+import { handleLogin, handleLogout, handleMe } from "./routes/auth.js";
+import { handleListModules, handleListCampaigns, handleCreateCampaign } from "./routes/campaigns.js";
+import { handleGetOrCreateInvite, handleRedeemInvite } from "./routes/invites.js";
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, X-Admin-Token",
-};
+const ALLOWED_ORIGIN_SUFFIXES = [".dosi-dm-companion.pages.dev"];
+const ALLOWED_ORIGINS = new Set([
+  "https://dosi-dm-companion.pages.dev",
+  "http://localhost:5173",
+  "http://localhost:4173",
+]);
+
+function isAllowedOrigin(origin: string): boolean {
+  return ALLOWED_ORIGINS.has(origin) || ALLOWED_ORIGIN_SUFFIXES.some((suffix) => origin.endsWith(suffix));
+}
+
+function corsHeaders(request: Request): Record<string, string> {
+  const origin = request.headers.get("Origin");
+  const allowOrigin = origin && isAllowedOrigin(origin) ? origin : "https://dosi-dm-companion.pages.dev";
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, X-Admin-Token",
+    "Access-Control-Allow-Credentials": "true",
+    Vary: "Origin",
+  };
+}
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    const CORS_HEADERS = corsHeaders(request);
+
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: CORS_HEADERS });
     }
@@ -24,30 +46,52 @@ export default {
     let response: Response;
 
     try {
-      if (pathname === "/api/search" && request.method === "GET") {
-        response = await handleSearch(request, env);
-      } else if (pathname === "/api/campaign" && request.method === "GET") {
-        response = await handleGetCampaign(env);
-      } else if (pathname === "/api/creatures" && request.method === "GET") {
-        response = await handleGetCreatures(env);
-      } else if (pathname === "/api/chat" && request.method === "POST") {
-        response = await handleChat(request, env);
+      const campaignSubMatch = /^\/api\/campaigns\/([^/]+)\/(.+)$/.exec(pathname);
+
+      if (pathname === "/api/auth/login" && request.method === "POST") {
+        response = await handleLogin(request, env);
+      } else if (pathname === "/api/auth/logout" && request.method === "POST") {
+        response = await handleLogout(request, env);
+      } else if (pathname === "/api/auth/me" && request.method === "GET") {
+        response = await handleMe(request, env);
+      } else if (pathname === "/api/auth/redeem-invite" && request.method === "POST") {
+        response = await handleRedeemInvite(request, env);
+      } else if (pathname === "/api/modules" && request.method === "GET") {
+        response = await handleListModules(env);
+      } else if (pathname === "/api/campaigns" && request.method === "GET") {
+        response = await handleListCampaigns(request, env);
+      } else if (pathname === "/api/campaigns" && request.method === "POST") {
+        response = await handleCreateCampaign(request, env);
       } else if (pathname === "/admin/load-sections" && request.method === "POST") {
         response = await handleLoadSections(request, env);
-      } else {
-        const sectionMatch = /^\/api\/sections\/([^/]+)$/.exec(pathname);
-        const narrativeMatch = /^\/api\/sections\/([^/]+)\/narrative-references$/.exec(pathname);
-        const revealMatch = /^\/api\/reveals\/([^/]+)\/toggle$/.exec(pathname);
+      } else if (campaignSubMatch) {
+        const campaignId = campaignSubMatch[1];
+        const sub = campaignSubMatch[2];
+        const sectionMatch = /^sections\/([^/]+)$/.exec(sub);
+        const narrativeMatch = /^sections\/([^/]+)\/narrative-references$/.exec(sub);
+        const revealMatch = /^reveals\/([^/]+)\/toggle$/.exec(sub);
 
-        if (narrativeMatch && request.method === "GET") {
-          response = await handleGetNarrativeReferences(narrativeMatch[1], env);
+        if (sub === "invite" && request.method === "POST") {
+          response = await handleGetOrCreateInvite(campaignId, request, env);
+        } else if (sub === "outline" && request.method === "GET") {
+          response = await handleGetCampaignOutline(campaignId, request, env);
+        } else if (sub === "creatures" && request.method === "GET") {
+          response = await handleGetCreatures(campaignId, request, env);
+        } else if (sub === "search" && request.method === "GET") {
+          response = await handleSearch(campaignId, request, env);
+        } else if (sub === "chat" && request.method === "POST") {
+          response = await handleChat(campaignId, request, env);
+        } else if (narrativeMatch && request.method === "GET") {
+          response = await handleGetNarrativeReferences(campaignId, narrativeMatch[1], request, env);
         } else if (sectionMatch && request.method === "GET") {
-          response = await handleGetSection(sectionMatch[1], env);
+          response = await handleGetSection(campaignId, sectionMatch[1], request, env);
         } else if (revealMatch && request.method === "POST") {
-          response = await handleToggleReveal(revealMatch[1], request, env);
+          response = await handleToggleReveal(campaignId, revealMatch[1], request, env);
         } else {
           response = new Response("Not found", { status: 404 });
         }
+      } else {
+        response = new Response("Not found", { status: 404 });
       }
     } catch (err) {
       response = new Response(`Internal error: ${(err as Error).message}`, { status: 500 });

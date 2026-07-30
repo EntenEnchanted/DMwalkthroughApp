@@ -2,17 +2,19 @@ import { useEffect, useState } from "react";
 import { getCreatures } from "../api";
 import type { CreatureSummary } from "../types";
 import { usePopup } from "../PopupContext";
+import { useCampaignId } from "../CampaignContext";
 
-export function RosterView() {
+export function BestiaryView() {
+  const campaignId = useCampaignId();
   const [creatures, setCreatures] = useState<CreatureSummary[] | null>(null);
   const { openSection } = usePopup();
 
   useEffect(() => {
-    getCreatures().then(setCreatures);
-  }, []);
+    getCreatures(campaignId).then(setCreatures);
+  }, [campaignId]);
 
-  if (!creatures) return <div className="empty-state">Loading roster…</div>;
-  if (creatures.length === 0) return <div className="empty-state">No characters or creatures yet.</div>;
+  if (!creatures) return <div className="empty-state">Loading bestiary…</div>;
+  if (creatures.length === 0) return <div className="empty-state">No creatures yet.</div>;
 
   return (
     <div className="roster-list">

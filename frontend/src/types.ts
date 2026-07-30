@@ -1,5 +1,27 @@
 export type SectionType = "location" | "encounter" | "creature" | "item" | "reference";
 
+export interface AuthUser {
+  id: string;
+  email: string;
+  role: "dm" | "player";
+}
+
+export interface Module {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+}
+
+export interface Campaign {
+  id: string;
+  name: string;
+  module_id: string;
+  module_name: string;
+  status: string;
+  created_at: number;
+}
+
 export interface Reveal {
   id: number;
   trigger_skill: string;
