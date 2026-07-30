@@ -85,6 +85,8 @@ input {
 
 .tab-bar {
   display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-bottom: 1px solid var(--border);
   background: var(--bg-elevated);
   position: sticky;
@@ -93,8 +95,8 @@ input {
 }
 
 .tab-bar button {
-  flex: 1;
-  padding: 14px 8px;
+  flex: none;
+  padding: 14px 16px;
   background: none;
   border: none;
   font-size: 0.95rem;
@@ -102,6 +104,7 @@ input {
   color: var(--text-dim);
   cursor: pointer;
   border-bottom: 2px solid transparent;
+  white-space: nowrap;
 }
 
 .tab-bar button.active {
@@ -870,9 +873,16 @@ input {
 
 .picker-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   margin-bottom: 16px;
+}
+
+.picker-header > div {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .picker-header h1 {

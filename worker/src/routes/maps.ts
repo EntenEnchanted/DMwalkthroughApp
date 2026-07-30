@@ -30,7 +30,7 @@ async function requireCampaignMember(
   request: Request,
   env: Env,
   campaignId: string
-): Promise<{ user: AuthUser } | { error: Response }> {
+): Promise<{ user: AuthUser; characterId: string | null } | { error: Response }> {
   const user = await getSessionUser(request, env);
   if (!user) return { error: new Response("Unauthorized", { status: 401 }) };
 
@@ -39,14 +39,26 @@ async function requireCampaignMember(
       .bind(campaignId)
       .first<{ dm_user_id: string }>();
     if (!campaign || campaign.dm_user_id !== user.id) return { error: new Response("Forbidden", { status: 403 }) };
-  } else {
-    const character = await env.DB.prepare(`SELECT id FROM characters WHERE campaign_id = ? AND player_user_id = ?`)
-      .bind(campaignId, user.id)
-      .first();
-    if (!character) return { error: new Response("Forbidden", { status: 403 }) };
+    return { user, characterId: null };
   }
 
-  return { user };
+  const character = await env.DB.prepare(`SELECT id FROM characters WHERE campaign_id = ? AND player_user_id = ?`)
+    .bind(campaignId, user.id)
+    .first<{ id: string }>();
+  if (!character) return { error: new Response("Forbidden", { status: 403 }) };
+
+  return { user, characterId: character.id };
+}
+
+// A character_id supplied for a token must actually belong to the campaign
+// the map is in — otherwise a token could be wired to a character from a
+// different campaign, handing that character's player write access (via
+// handleUpdateToken) to a campaign they were never invited to.
+async function characterBelongsToCampaign(env: Env, characterId: string, campaignId: string): Promise<boolean> {
+  const character = await env.DB.prepare(`SELECT id FROM characters WHERE id = ? AND campaign_id = ?`)
+    .bind(characterId, campaignId)
+    .first();
+  return Boolean(character);
 }
 
 async function requireCampaignDm(
@@ -126,6 +138,7 @@ export async function handleSetActiveMap(campaignId: string, request: Request, e
 export async function handleGetActiveMap(campaignId: string, request: Request, env: Env): Promise<Response> {
   const result = await requireCampaignMember(request, env, campaignId);
   if ("error" in result) return result.error;
+  const { user, characterId } = result;
 
   const campaign = await env.DB.prepare(`SELECT active_map_id FROM campaigns WHERE id = ?`)
     .bind(campaignId)
@@ -142,6 +155,18 @@ export async function handleGetActiveMap(campaignId: string, request: Request, e
   const fog = await env.DB.prepare(`SELECT revealed_cells_json FROM fog_state WHERE map_id = ?`)
     .bind(map.id)
     .first<{ revealed_cells_json: string }>();
+  const revealedCells: string[] = JSON.parse(fog?.revealed_cells_json ?? "[]");
+  const revealedSet = new Set(revealedCells);
+
+  // The DM sees every token unconditionally. A player only ever sees their
+  // own character's token plus tokens standing on a currently-revealed
+  // cell — fog-of-war has to be enforced here, not just by an opaque div
+  // client-side, or any campaign member could read hidden monster
+  // positions/HP straight from the API response.
+  const visibleTokens =
+    user.role === "dm"
+      ? tokens
+      : tokens.filter((t) => t.character_id === characterId || revealedSet.has(`${t.x},${t.y}`));
 
   return Response.json({
     map: {
@@ -152,8 +177,8 @@ export async function handleGetActiveMap(campaignId: string, request: Request, e
       width_px: map.width_px,
       height_px: map.height_px,
     },
-    tokens: tokens.map((t) => ({ ...t, character_id: t.character_id ?? undefined })),
-    revealed_cells: JSON.parse(fog?.revealed_cells_json ?? "[]"),
+    tokens: visibleTokens.map((t) => ({ ...t, character_id: t.character_id ?? undefined })),
+    revealed_cells: revealedCells,
   });
 }
 
@@ -180,6 +205,10 @@ export async function handleAddToken(campaignId: string, request: Request, env: 
     .bind(body.map_id, campaignId)
     .first();
   if (!map) return new Response("Not found", { status: 404 });
+
+  if (body.character_id && !(await characterBelongsToCampaign(env, body.character_id, campaignId))) {
+    return new Response("character_id does not belong to this campaign", { status: 400 });
+  }
 
   const id = crypto.randomUUID();
   await env.DB.prepare(
@@ -241,12 +270,16 @@ export async function handleUpdateToken(tokenId: string, request: Request, env: 
     return Response.json({ ok: true });
   }
 
-  // Players may only move their own character's token — x/y only.
+  // Players may only move their own character's token — x/y only. The
+  // character must also actually belong to this token's campaign (defense
+  // in depth against a token ever being wired to a foreign character).
   if (!token.character_id) return new Response("Forbidden", { status: 403 });
-  const character = await env.DB.prepare(`SELECT player_user_id FROM characters WHERE id = ?`)
+  const character = await env.DB.prepare(`SELECT player_user_id, campaign_id FROM characters WHERE id = ?`)
     .bind(token.character_id)
-    .first<{ player_user_id: string }>();
-  if (!character || character.player_user_id !== user.id) return new Response("Forbidden", { status: 403 });
+    .first<{ player_user_id: string; campaign_id: string }>();
+  if (!character || character.player_user_id !== user.id || character.campaign_id !== map.campaign_id) {
+    return new Response("Forbidden", { status: 403 });
+  }
 
   if (body.x === undefined && body.y === undefined) return Response.json({ ok: true });
   await env.DB.prepare(`UPDATE tokens SET x = ?, y = ? WHERE id = ?`)

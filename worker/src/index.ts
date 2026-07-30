@@ -53,6 +53,8 @@ function corsHeaders(request: Request): Record<string, string> {
   };
 }
 
+const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const CORS_HEADERS = corsHeaders(request);
@@ -63,6 +65,23 @@ export default {
 
     const url = new URL(request.url);
     const { pathname } = url;
+
+    // CSRF: cookie-authenticated mutating requests must carry an Origin
+    // we recognize — a cross-site page can send a simple POST with the
+    // session cookie attached (SameSite=None is required cross-site; see
+    // Phase 0 commit), but it can't forge our Origin. /admin/* is exempt:
+    // it's authenticated by a header token the caller must already know,
+    // not a cookie, so it isn't CSRF-able and is normally called from a
+    // script with no Origin header at all.
+    if (!SAFE_METHODS.has(request.method) && !pathname.startsWith("/admin/")) {
+      const origin = request.headers.get("Origin");
+      if (!origin || !isAllowedOrigin(origin)) {
+        const rejected = new Response("Forbidden", { status: 403 });
+        for (const [k, v] of Object.entries(CORS_HEADERS)) rejected.headers.set(k, v);
+        return rejected;
+      }
+    }
+
     let response: Response;
 
     try {
