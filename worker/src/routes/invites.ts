@@ -1,6 +1,7 @@
 import type { Env } from "../types.js";
 import { requireCampaignDm } from "./campaigns.js";
 import { createSession, hashPassword, sessionCookieHeader, verifyPassword } from "../auth.js";
+import { getOrCreateCharacter } from "./characters.js";
 
 const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // no ambiguous chars (0/O, 1/I/L)
 
@@ -31,13 +32,18 @@ export async function handleGetOrCreateInvite(campaignId: string, request: Reque
   return Response.json({ code });
 }
 
-// Logs in an existing player or registers a new one, then hands back which
-// campaign the code belongs to. Creating the player's character record
-// happens in Phase 1 once the `characters` table exists.
+// Logs in an existing player or registers a new one, then creates (or
+// reuses) their character for the invited campaign — one PC per player
+// per campaign, matching how D&D is actually played.
 export async function handleRedeemInvite(request: Request, env: Env): Promise<Response> {
-  const { code, email, password } = (await request.json()) as { code?: string; email?: string; password?: string };
-  if (!code?.trim() || !email?.trim() || !password) {
-    return new Response("Missing code, email, or password", { status: 400 });
+  const { code, email, password, character_name } = (await request.json()) as {
+    code?: string;
+    email?: string;
+    password?: string;
+    character_name?: string;
+  };
+  if (!code?.trim() || !email?.trim() || !password || !character_name?.trim()) {
+    return new Response("Missing code, email, password, or character name", { status: 400 });
   }
 
   const invite = await env.DB.prepare(`SELECT campaign_id FROM campaign_invites WHERE code = ?`)
@@ -67,9 +73,15 @@ export async function handleRedeemInvite(request: Request, env: Env): Promise<Re
       .run();
   }
 
+  const characterId = await getOrCreateCharacter(env, invite.campaign_id, userId, character_name);
+
   const token = await createSession(env, userId);
   return new Response(
-    JSON.stringify({ campaign_id: invite.campaign_id, user: { id: userId, email: normalizedEmail, role: "player" } }),
+    JSON.stringify({
+      campaign_id: invite.campaign_id,
+      character_id: characterId,
+      user: { id: userId, email: normalizedEmail, role: "player" },
+    }),
     { headers: { "content-type": "application/json", "Set-Cookie": sessionCookieHeader(token) } }
   );
 }

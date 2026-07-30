@@ -1,4 +1,15 @@
-import type { AuthUser, Campaign, CreatureSummary, Module, NarrativeReference, SearchResult, SectionDetail } from "./types";
+import type {
+  AuthUser,
+  Campaign,
+  Character,
+  CharacterSummary,
+  CreatureSummary,
+  MyCharacterSummary,
+  Module,
+  NarrativeReference,
+  SearchResult,
+  SectionDetail,
+} from "./types";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8787";
 
@@ -24,6 +35,18 @@ function apiPost(path: string, body: unknown): Promise<Response> {
   });
 }
 
+function apiPatch(path: string, body: unknown): Promise<Response> {
+  return apiFetch(path, {
+    method: "PATCH",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+function apiDelete(path: string): Promise<Response> {
+  return apiFetch(path, { method: "DELETE" });
+}
+
 // --- Auth ---
 
 export async function login(email: string, password: string): Promise<AuthUser> {
@@ -43,8 +66,15 @@ export async function getMe(): Promise<AuthUser | null> {
   }
 }
 
-export async function redeemInvite(code: string, email: string, password: string): Promise<{ campaign_id: string; user: AuthUser }> {
-  return (await apiPost("/api/auth/redeem-invite", { code, email, password })).json();
+export async function redeemInvite(
+  code: string,
+  email: string,
+  password: string,
+  characterName: string
+): Promise<{ campaign_id: string; character_id: string; user: AuthUser }> {
+  return (
+    await apiPost("/api/auth/redeem-invite", { code, email, password, character_name: characterName })
+  ).json();
 }
 
 // --- Campaigns ---
@@ -105,6 +135,51 @@ export async function getNarrativeReferences(campaignId: string, id: string): Pr
 
 export async function toggleReveal(campaignId: string, revealId: number, revealed: boolean): Promise<void> {
   await apiPost(`/api/campaigns/${encodeURIComponent(campaignId)}/reveals/${revealId}/toggle`, { revealed });
+}
+
+// --- Characters ---
+
+export async function listCharacters(campaignId: string): Promise<CharacterSummary[]> {
+  const res = await apiFetch(`/api/campaigns/${encodeURIComponent(campaignId)}/characters`);
+  const data = (await res.json()) as { characters: CharacterSummary[] };
+  return data.characters;
+}
+
+export async function listMyCharacters(): Promise<MyCharacterSummary[]> {
+  const res = await apiFetch("/api/me/characters");
+  const data = (await res.json()) as { characters: MyCharacterSummary[] };
+  return data.characters;
+}
+
+export async function getCharacter(characterId: string): Promise<Character> {
+  const res = await apiFetch(`/api/characters/${encodeURIComponent(characterId)}`);
+  return res.json();
+}
+
+export async function updateCharacter(characterId: string, patch: Partial<Character>): Promise<void> {
+  await apiPatch(`/api/characters/${encodeURIComponent(characterId)}`, patch);
+}
+
+export async function addCharacterItem(
+  characterId: string,
+  item: { name: string; quantity: number; weight: number; equipped: boolean; notes: string }
+): Promise<string> {
+  const data = (await (
+    await apiPost(`/api/characters/${encodeURIComponent(characterId)}/items`, item)
+  ).json()) as { id: string };
+  return data.id;
+}
+
+export async function updateCharacterItem(
+  characterId: string,
+  itemId: string,
+  patch: Partial<{ name: string; quantity: number; weight: number; equipped: boolean; notes: string }>
+): Promise<void> {
+  await apiPatch(`/api/characters/${encodeURIComponent(characterId)}/items/${encodeURIComponent(itemId)}`, patch);
+}
+
+export async function deleteCharacterItem(characterId: string, itemId: string): Promise<void> {
+  await apiDelete(`/api/characters/${encodeURIComponent(characterId)}/items/${encodeURIComponent(itemId)}`);
 }
 
 export async function* streamChat(campaignId: string, message: string): AsyncGenerator<string> {

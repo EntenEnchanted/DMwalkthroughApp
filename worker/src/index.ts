@@ -9,6 +9,15 @@ import { handleGetCreatures } from "./routes/creatures.js";
 import { handleLogin, handleLogout, handleMe } from "./routes/auth.js";
 import { handleListModules, handleListCampaigns, handleCreateCampaign } from "./routes/campaigns.js";
 import { handleGetOrCreateInvite, handleRedeemInvite } from "./routes/invites.js";
+import {
+  handleListCharacters,
+  handleListMyCharacters,
+  handleGetCharacter,
+  handleUpdateCharacter,
+  handleAddItem,
+  handleUpdateItem,
+  handleDeleteItem,
+} from "./routes/characters.js";
 
 const ALLOWED_ORIGIN_SUFFIXES = [".dosi-dm-companion.pages.dev"];
 const ALLOWED_ORIGINS = new Set([
@@ -26,7 +35,7 @@ function corsHeaders(request: Request): Record<string, string> {
   const allowOrigin = origin && isAllowedOrigin(origin) ? origin : "https://dosi-dm-companion.pages.dev";
   return {
     "Access-Control-Allow-Origin": allowOrigin,
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, X-Admin-Token",
     "Access-Control-Allow-Credentials": "true",
     Vary: "Origin",
@@ -64,6 +73,8 @@ export default {
         response = await handleCreateCampaign(request, env);
       } else if (pathname === "/admin/load-sections" && request.method === "POST") {
         response = await handleLoadSections(request, env);
+      } else if (pathname === "/api/me/characters" && request.method === "GET") {
+        response = await handleListMyCharacters(request, env);
       } else if (campaignSubMatch) {
         const campaignId = campaignSubMatch[1];
         const sub = campaignSubMatch[2];
@@ -77,6 +88,8 @@ export default {
           response = await handleGetCampaignOutline(campaignId, request, env);
         } else if (sub === "creatures" && request.method === "GET") {
           response = await handleGetCreatures(campaignId, request, env);
+        } else if (sub === "characters" && request.method === "GET") {
+          response = await handleListCharacters(campaignId, request, env);
         } else if (sub === "search" && request.method === "GET") {
           response = await handleSearch(campaignId, request, env);
         } else if (sub === "chat" && request.method === "POST") {
@@ -90,6 +103,26 @@ export default {
         } else {
           response = new Response("Not found", { status: 404 });
         }
+      } else if (/^\/api\/characters\/[^/]+$/.test(pathname) && (request.method === "GET" || request.method === "PATCH")) {
+        const characterId = pathname.split("/")[3];
+        response =
+          request.method === "GET"
+            ? await handleGetCharacter(characterId, request, env)
+            : await handleUpdateCharacter(characterId, request, env);
+      } else if (/^\/api\/characters\/[^/]+\/items$/.test(pathname) && request.method === "POST") {
+        const characterId = pathname.split("/")[3];
+        response = await handleAddItem(characterId, request, env);
+      } else if (
+        /^\/api\/characters\/[^/]+\/items\/[^/]+$/.test(pathname) &&
+        (request.method === "PATCH" || request.method === "DELETE")
+      ) {
+        const parts = pathname.split("/");
+        const characterId = parts[3];
+        const itemId = parts[5];
+        response =
+          request.method === "PATCH"
+            ? await handleUpdateItem(characterId, itemId, request, env)
+            : await handleDeleteItem(characterId, itemId, request, env);
       } else {
         response = new Response("Not found", { status: 404 });
       }

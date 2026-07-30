@@ -64,6 +64,7 @@ function DmLoginForm() {
 function JoinForm({ onJoined }: { onJoined: (campaignId: string) => void }) {
   const { setUser } = useAuth();
   const [code, setCode] = useState("");
+  const [characterName, setCharacterName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +75,7 @@ function JoinForm({ onJoined }: { onJoined: (campaignId: string) => void }) {
     setError(null);
     setSubmitting(true);
     try {
-      const result = await redeemInvite(code, email, password);
+      const result = await redeemInvite(code, email, password, characterName);
       setUser(result.user);
       onJoined(result.campaign_id);
     } catch {
@@ -91,6 +92,12 @@ function JoinForm({ onJoined }: { onJoined: (campaignId: string) => void }) {
         value={code}
         onChange={(e) => setCode(e.target.value.toUpperCase())}
         autoCapitalize="characters"
+        required
+      />
+      <input
+        placeholder="Your character's name"
+        value={characterName}
+        onChange={(e) => setCharacterName(e.target.value)}
         required
       />
       <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />

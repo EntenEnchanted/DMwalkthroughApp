@@ -85,3 +85,68 @@ export interface NarrativeReference {
   dm_only_text: string;
   read_aloud_text: string;
 }
+
+export interface AbilityScores {
+  str: number;
+  dex: number;
+  con: number;
+  int: number;
+  wis: number;
+  cha: number;
+}
+
+export interface Currency {
+  cp: number;
+  sp: number;
+  ep: number;
+  gp: number;
+  pp: number;
+}
+
+export interface CharacterItem {
+  id: string;
+  name: string;
+  quantity: number;
+  weight: number;
+  equipped: boolean;
+  notes: string;
+  srd_equipment_slug: string | null;
+}
+
+export interface Character {
+  id: string;
+  campaign_id: string;
+  player_user_id: string;
+  name: string;
+  class: string;
+  level: number;
+  race: string;
+  background: string;
+  xp: number;
+  current_hp: number;
+  max_hp: number;
+  ac: number;
+  speed: number;
+  ability_scores: AbilityScores;
+  currency: Currency;
+  features: string[];
+  notes: string;
+  items: CharacterItem[];
+}
+
+export interface CharacterSummary {
+  id: string;
+  name: string;
+  class: string;
+  level: number;
+  race: string;
+  current_hp: number;
+  max_hp: number;
+}
+
+export interface MyCharacterSummary {
+  id: string;
+  name: string;
+  campaign_id: string;
+  campaign_name: string;
+}
