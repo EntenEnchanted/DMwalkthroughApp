@@ -118,6 +118,14 @@ async function main() {
   // Same dosi-exception as run.ts: dosi's existing ids stay unprefixed.
   const id = (...parts: string[]) => (moduleId === "dosi" ? slugify(...parts) : slugify(moduleId, ...parts));
 
+  // Narrative ids additionally need `order` for non-dosi modules — chapter
+  // + leaf title alone collides whenever a chapter repeats a heading
+  // across rooms (e.g. LMoP's many per-room "Treasure"/"Developments"
+  // sub-sections), which would otherwise silently overwrite each other
+  // via upsertSection's ON CONFLICT(id). dosi's 2-part scheme is untouched.
+  const narrativeId = (chapterIdx: string, order: number, title: string) =>
+    moduleId === "dosi" ? id(chapterIdx, title) : id(chapterIdx, String(order), title);
+
   const creatureSections = buildCreatureSections(seedPath).map((c, i) => ({
     id: id("creature", c.title),
     module_id: moduleId,
@@ -162,7 +170,7 @@ async function main() {
       .filter((x): x is string => Boolean(x));
 
     const finalSection: FinalSection = {
-      id: id(String(chapterIndex(section.chapter)), section.title),
+      id: narrativeId(String(chapterIndex(section.chapter)), section.order, section.title),
       module_id: moduleId,
       chapter: section.chapter,
       heading: section.title,

@@ -67,6 +67,15 @@ async function main() {
   // unique cross-module without touching anything already ingested.
   const id = (...parts: string[]) => (moduleId === "dosi" ? slugify(...parts) : slugify(moduleId, ...parts));
 
+  // Narrative-section ids additionally need the section's unique `order`
+  // for non-dosi modules: chapter+title alone collides whenever a chapter
+  // repeats a leaf heading across multiple rooms/encounters (LMoP's "Wave
+  // Echo Cave" chapter alone has 31 "Treasure" and 20 "Developments"
+  // sub-sections) — those would otherwise silently overwrite each other
+  // via upsertSection's ON CONFLICT(id). dosi's 2-part scheme is untouched.
+  const narrativeId = (chapterIdx: string, order: number, title: string) =>
+    moduleId === "dosi" ? id(chapterIdx, title) : id(chapterIdx, String(order), title);
+
   const creatureSections = buildCreatureSections(seedPath).map((c, i) => ({
     id: id("creature", c.title),
     module_id: moduleId,
@@ -123,7 +132,7 @@ async function main() {
       .filter((x): x is string => Boolean(x));
 
     classified.push({
-      id: id(String(chapterIndex(section.chapter)), section.title),
+      id: narrativeId(String(chapterIndex(section.chapter)), section.order, section.title),
       module_id: moduleId,
       chapter: section.chapter,
       heading: section.title,
