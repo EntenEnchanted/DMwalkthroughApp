@@ -1,6 +1,16 @@
 import { useEffect, useRef, useState, type ChangeEvent, type MouseEvent } from "react";
-import { addToken, createMap, deleteToken, getActiveMap, toggleFogCell, updateToken, uploadMapImage } from "../api";
-import type { ActiveMapState, MapToken } from "../types";
+import {
+  addToken,
+  createMap,
+  deleteToken,
+  getActiveMap,
+  listMaps,
+  setActiveMap,
+  toggleFogCell,
+  updateToken,
+  uploadMapImage,
+} from "../api";
+import type { ActiveMapState, MapSummary, MapToken } from "../types";
 import { useAuth } from "../AuthContext";
 
 const POLL_MS = 2500;
@@ -9,9 +19,15 @@ export function BattleMapView({ campaignId, myCharacterId }: { campaignId: strin
   const { user } = useAuth();
   const isDm = user?.role === "dm";
   const [state, setState] = useState<ActiveMapState | null>(null);
+  const [mapList, setMapList] = useState<MapSummary[]>([]);
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
   const [fogMode, setFogMode] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  function refreshMapList() {
+    if (isDm) listMaps(campaignId).then(setMapList);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -21,12 +37,26 @@ export function BattleMapView({ campaignId, myCharacterId }: { campaignId: strin
       });
     }
     poll();
+    refreshMapList();
     const interval = setInterval(poll, POLL_MS);
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [campaignId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [campaignId, isDm]);
+
+  async function handleSwitchMap(mapId: string) {
+    setShowCreateForm(false);
+    await setActiveMap(campaignId, mapId);
+    getActiveMap(campaignId).then(setState);
+  }
+
+  function handleMapCreated() {
+    setShowCreateForm(false);
+    refreshMapList();
+    getActiveMap(campaignId).then(setState);
+  }
 
   function canMove(token: MapToken): boolean {
     return isDm || token.character_id === myCharacterId;
@@ -77,15 +107,26 @@ export function BattleMapView({ campaignId, myCharacterId }: { campaignId: strin
 
   if (!state) return <div className="empty-state">Loading map…</div>;
 
-  if (!state.map) {
-    return isDm ? (
-      <CreateMapForm
-        campaignId={campaignId}
-        onCreated={() => getActiveMap(campaignId).then(setState)}
-      />
-    ) : (
-      <div className="empty-state">The DM hasn't started a battle map yet.</div>
+  if (isDm && (showCreateForm || !state.map)) {
+    return (
+      <div>
+        {mapList.length > 0 && (
+          <div className="map-toolbar">
+            <MapSwitcher maps={mapList} activeId={state.map?.id ?? null} onSwitch={handleSwitchMap} />
+            {state.map && (
+              <button className="link-button" onClick={() => setShowCreateForm(false)}>
+                Cancel
+              </button>
+            )}
+          </div>
+        )}
+        <CreateMapForm campaignId={campaignId} onCreated={handleMapCreated} />
+      </div>
     );
+  }
+
+  if (!state.map) {
+    return <div className="empty-state">The DM hasn't started a battle map yet.</div>;
   }
 
   const { map } = state;
@@ -96,6 +137,10 @@ export function BattleMapView({ campaignId, myCharacterId }: { campaignId: strin
     <div>
       {isDm && (
         <div className="map-toolbar">
+          <MapSwitcher maps={mapList} activeId={map.id} onSwitch={handleSwitchMap} />
+          <button className="link-button" onClick={() => setShowCreateForm(true)}>
+            + New map
+          </button>
           <button className={fogMode ? "active" : ""} onClick={() => setFogMode((v) => !v)}>
             {fogMode ? "Painting fog…" : "Paint fog"}
           </button>
@@ -161,6 +206,32 @@ export function BattleMapView({ campaignId, myCharacterId }: { campaignId: strin
         })}
       </div>
     </div>
+  );
+}
+
+function MapSwitcher({
+  maps,
+  activeId,
+  onSwitch,
+}: {
+  maps: MapSummary[];
+  activeId: string | null;
+  onSwitch: (mapId: string) => void;
+}) {
+  if (maps.length === 0) return null;
+  return (
+    <select
+      className="map-switcher"
+      value={activeId ?? ""}
+      onChange={(e) => e.target.value && onSwitch(e.target.value)}
+    >
+      {!activeId && <option value="">Select a map…</option>}
+      {maps.map((m) => (
+        <option key={m.id} value={m.id}>
+          {m.name}
+        </option>
+      ))}
+    </select>
   );
 }
 
