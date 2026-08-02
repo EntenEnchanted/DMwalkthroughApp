@@ -342,3 +342,40 @@ export async function handleToggleFogCell(mapId: string, request: Request, env: 
 
   return Response.json({ ok: true, revealed_cells: next });
 }
+
+const ALLOWED_IMAGE_TYPES: Record<string, string> = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/webp": "webp",
+  "image/gif": "gif",
+};
+
+export async function handleUploadMapImage(campaignId: string, request: Request, env: Env): Promise<Response> {
+  const result = await requireCampaignDm(request, env, campaignId);
+  if ("error" in result) return result.error;
+
+  const contentType = request.headers.get("Content-Type") ?? "";
+  const ext = ALLOWED_IMAGE_TYPES[contentType];
+  if (!ext) return new Response("Unsupported image type (use PNG, JPEG, WebP, or GIF)", { status: 400 });
+  if (!request.body) return new Response("Missing image body", { status: 400 });
+
+  const key = `${campaignId}/${crypto.randomUUID()}.${ext}`;
+  await env.MAP_IMAGES.put(key, request.body, { httpMetadata: { contentType } });
+
+  return Response.json({ key });
+}
+
+// Public/unauthenticated: map backgrounds aren't tiered DM-only content,
+// and keys are random UUIDs (unguessable), so this is a plain CDN-style
+// GET rather than requiring session plumbing for image loads.
+export async function handleGetMapImage(key: string, env: Env): Promise<Response> {
+  const object = await env.MAP_IMAGES.get(key);
+  if (!object) return new Response("Not found", { status: 404 });
+
+  return new Response(object.body, {
+    headers: {
+      "Content-Type": object.httpMetadata?.contentType ?? "application/octet-stream",
+      "Cache-Control": "public, max-age=31536000, immutable",
+    },
+  });
+}

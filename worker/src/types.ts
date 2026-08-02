@@ -2,6 +2,7 @@ export interface Env {
   DB: D1Database;
   VECTORIZE: VectorizeIndex;
   AI: Ai;
+  MAP_IMAGES: R2Bucket;
   ANTHROPIC_API_KEY: string;
   ADMIN_TOKEN: string;
 }

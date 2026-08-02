@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type MouseEvent } from "react";
-import { addToken, createMap, deleteToken, getActiveMap, toggleFogCell, updateToken } from "../api";
+import { useEffect, useRef, useState, type ChangeEvent, type MouseEvent } from "react";
+import { addToken, createMap, deleteToken, getActiveMap, toggleFogCell, updateToken, uploadMapImage } from "../api";
 import type { ActiveMapState, MapToken } from "../types";
 import { useAuth } from "../AuthContext";
 
@@ -166,18 +166,49 @@ export function BattleMapView({ campaignId, myCharacterId }: { campaignId: strin
 
 function CreateMapForm({ campaignId, onCreated }: { campaignId: string; onCreated: () => void }) {
   const [name, setName] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [widthPx, setWidthPx] = useState(1000);
   const [heightPx, setHeightPx] = useState(700);
   const [gridSizePx, setGridSizePx] = useState(50);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
+    const picked = e.target.files?.[0];
+    if (!picked) return;
+    setError(null);
+    setFile(picked);
+
+    const objectUrl = URL.createObjectURL(picked);
+    setPreviewUrl(objectUrl);
+    const img = new Image();
+    img.onload = () => {
+      setWidthPx(img.naturalWidth);
+      setHeightPx(img.naturalHeight);
+      URL.revokeObjectURL(objectUrl);
+    };
+    img.src = objectUrl;
+
+    if (!name.trim()) setName(picked.name.replace(/\.[^.]+$/, ""));
+  }
 
   async function handleSubmit() {
-    if (!name.trim() || !imageUrl.trim()) return;
+    if (!name.trim() || !file) return;
     setSubmitting(true);
+    setError(null);
     try {
-      await createMap(campaignId, { name: name.trim(), image_url: imageUrl.trim(), grid_size_px: gridSizePx, width_px: widthPx, height_px: heightPx });
+      const imageUrl = await uploadMapImage(campaignId, file);
+      await createMap(campaignId, {
+        name: name.trim(),
+        image_url: imageUrl,
+        grid_size_px: gridSizePx,
+        width_px: widthPx,
+        height_px: heightPx,
+      });
       onCreated();
+    } catch {
+      setError("Upload failed. Make sure it's a PNG, JPEG, WebP, or GIF.");
     } finally {
       setSubmitting(false);
     }
@@ -187,7 +218,8 @@ function CreateMapForm({ campaignId, onCreated }: { campaignId: string; onCreate
     <div className="new-campaign-form">
       <h2>Start a battle map</h2>
       <input placeholder="Map name" value={name} onChange={(e) => setName(e.target.value)} />
-      <input placeholder="Image URL" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+      <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={handleFileChange} />
+      {previewUrl && <img src={previewUrl} alt="Map preview" className="map-upload-preview" />}
       <div className="sheet-row">
         <label className="sheet-field">
           <span>Width (px)</span>
@@ -202,8 +234,9 @@ function CreateMapForm({ campaignId, onCreated }: { campaignId: string; onCreate
           <input type="number" value={gridSizePx} onChange={(e) => setGridSizePx(Number(e.target.value))} />
         </label>
       </div>
-      <button disabled={submitting} onClick={handleSubmit}>
-        {submitting ? "Creating…" : "Create map"}
+      {error && <div className="auth-error">{error}</div>}
+      <button disabled={submitting || !file} onClick={handleSubmit}>
+        {submitting ? "Uploading…" : "Create map"}
       </button>
     </div>
   );

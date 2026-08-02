@@ -205,6 +205,18 @@ export async function getSrdEntry(slug: string): Promise<SrdEntryDetail> {
 
 // --- Battle maps ---
 
+export async function uploadMapImage(campaignId: string, file: File): Promise<string> {
+  const res = await fetch(`${API_URL}/api/campaigns/${encodeURIComponent(campaignId)}/maps/upload-image`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": file.type },
+    body: file,
+  });
+  if (!res.ok) throw new ApiError(res.status, await res.text());
+  const data = (await res.json()) as { key: string };
+  return `${API_URL}/api/map-images/${data.key}`;
+}
+
 export async function createMap(
   campaignId: string,
   map: { name: string; image_url: string; grid_size_px: number; width_px: number; height_px: number }

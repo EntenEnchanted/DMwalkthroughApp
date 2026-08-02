@@ -28,6 +28,8 @@ import {
   handleUpdateToken,
   handleDeleteToken,
   handleToggleFogCell,
+  handleUploadMapImage,
+  handleGetMapImage,
 } from "./routes/maps.js";
 
 const ALLOWED_ORIGIN_SUFFIXES = [".dosi-dm-companion.pages.dev"];
@@ -109,6 +111,9 @@ export default {
         response = await handleListSrd(request, env);
       } else if (/^\/api\/srd\/[^/]+$/.test(pathname) && request.method === "GET") {
         response = await handleGetSrdEntry(pathname.split("/")[3], request, env);
+      } else if (/^\/api\/map-images\/(.+)$/.test(pathname) && request.method === "GET") {
+        const key = decodeURIComponent(/^\/api\/map-images\/(.+)$/.exec(pathname)![1]);
+        response = await handleGetMapImage(key, env);
       } else if (campaignSubMatch) {
         const campaignId = campaignSubMatch[1];
         const sub = campaignSubMatch[2];
@@ -118,6 +123,8 @@ export default {
 
         if (sub === "invite" && request.method === "POST") {
           response = await handleGetOrCreateInvite(campaignId, request, env);
+        } else if (sub === "maps/upload-image" && request.method === "POST") {
+          response = await handleUploadMapImage(campaignId, request, env);
         } else if (sub === "maps" && request.method === "POST") {
           response = await handleCreateMap(campaignId, request, env);
         } else if (sub === "maps" && request.method === "GET") {

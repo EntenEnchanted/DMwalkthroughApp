@@ -13,3 +13,7 @@ index_name = "dosi-sections"
 
 [ai]
 binding = "AI"
+
+[[r2_buckets]]
+binding = "MAP_IMAGES"
+bucket_name = "dosi-map-images"
