@@ -836,6 +836,13 @@ input {
   outline: none;
 }
 
+.auth-secondary-link {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 12px;
+}
+
 .auth-form input:focus,
 .auth-form select:focus {
   border-color: var(--accent);
@@ -953,6 +960,12 @@ input {
   padding: 4px 8px;
   border: 1px solid var(--border);
   border-radius: 6px;
+}
+
+.dm-invite-banner {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 16px;
 }
 
 .new-campaign-form {

@@ -71,6 +71,15 @@ export async function getMe(): Promise<AuthUser | null> {
   }
 }
 
+export async function registerDm(code: string, email: string, password: string): Promise<AuthUser> {
+  return (await apiPost("/api/auth/register-dm", { code, email, password })).json();
+}
+
+export async function getOrCreateDmInvite(): Promise<string> {
+  const data = (await (await apiPost("/api/dm-invite", {})).json()) as { code: string };
+  return data.code;
+}
+
 export async function redeemInvite(
   code: string,
   email: string,

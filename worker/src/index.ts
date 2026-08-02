@@ -9,6 +9,7 @@ import { handleGetCreatures } from "./routes/creatures.js";
 import { handleLogin, handleLogout, handleMe } from "./routes/auth.js";
 import { handleListModules, handleListCampaigns, handleCreateCampaign } from "./routes/campaigns.js";
 import { handleGetOrCreateInvite, handleRedeemInvite } from "./routes/invites.js";
+import { handleGetOrCreateDmInvite, handleRegisterDm } from "./routes/dmInvites.js";
 import {
   handleListCharacters,
   handleListMyCharacters,
@@ -97,6 +98,10 @@ export default {
         response = await handleMe(request, env);
       } else if (pathname === "/api/auth/redeem-invite" && request.method === "POST") {
         response = await handleRedeemInvite(request, env);
+      } else if (pathname === "/api/auth/register-dm" && request.method === "POST") {
+        response = await handleRegisterDm(request, env);
+      } else if (pathname === "/api/dm-invite" && request.method === "POST") {
+        response = await handleGetOrCreateDmInvite(request, env);
       } else if (pathname === "/api/modules" && request.method === "GET") {
         response = await handleListModules(env);
       } else if (pathname === "/api/campaigns" && request.method === "GET") {

@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { createCampaign, getOrCreateInvite, listCampaigns, listModules } from "../api";
+import { createCampaign, getOrCreateDmInvite, getOrCreateInvite, listCampaigns, listModules } from "../api";
 import type { Campaign, Module } from "../types";
 import { useAuth } from "../AuthContext";
 
@@ -9,6 +9,7 @@ export function CampaignPickerView({ onSelect }: { onSelect: (campaignId: string
   const [modules, setModules] = useState<Module[]>([]);
   const [creating, setCreating] = useState(false);
   const [inviteCodes, setInviteCodes] = useState<Record<string, string>>({});
+  const [dmInviteCode, setDmInviteCode] = useState<string | null>(null);
 
   useEffect(() => {
     listCampaigns().then(setCampaigns);
@@ -31,6 +32,11 @@ export function CampaignPickerView({ onSelect }: { onSelect: (campaignId: string
     setInviteCodes((prev) => ({ ...prev, [campaignId]: code }));
   }
 
+  async function handleShowDmInvite() {
+    const code = await getOrCreateDmInvite();
+    setDmInviteCode(code);
+  }
+
   return (
     <div className="picker-screen">
       <div className="picker-header">
@@ -38,6 +44,19 @@ export function CampaignPickerView({ onSelect }: { onSelect: (campaignId: string
         <button className="link-button" onClick={() => logout()}>
           Log out
         </button>
+      </div>
+
+      <div className="dm-invite-banner">
+        {dmInviteCode ? (
+          <span>
+            DM invite code: <span className="invite-code">{dmInviteCode}</span> — share this with anyone you want to
+            let create a DM account.
+          </span>
+        ) : (
+          <button className="link-button" onClick={handleShowDmInvite}>
+            Get DM invite code (to let someone else create a DM account)
+          </button>
+        )}
       </div>
 
       {campaigns === null && <div className="empty-state">Loading campaigns…</div>}
