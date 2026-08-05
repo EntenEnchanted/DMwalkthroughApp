@@ -5,7 +5,14 @@ import { classifySection } from "./classify.js";
 import { buildCreatureSections } from "./buildCreatureSections.js";
 import { buildItemSections } from "./buildItemSections.js";
 import { slugify } from "./slugify.js";
-import type { SectionType, Reveal } from "./types.js";
+import type {
+  Conditional,
+  NamedBlock,
+  Prompt,
+  ReadAloud,
+  Reveal,
+  SectionType,
+} from "./types.js";
 
 const OUTPUT_DIR = "./output";
 
@@ -22,6 +29,14 @@ export interface FinalSection {
   reveals: Reveal[];
   references: string[]; // ids of referenced creature sections
   stat_block?: unknown;
+  // Block model. The worker derives read_aloud_text/dm_only_text from these,
+  // so sections carrying blocks keep search, chat and the popup working.
+  read_alouds?: ReadAloud[];
+  background_text?: string;
+  prompts?: Prompt[];
+  technique?: NamedBlock[];
+  conditionals?: Conditional[];
+  features?: NamedBlock[];
 }
 
 function parseArgs() {
@@ -124,8 +139,12 @@ async function main() {
   const classified: FinalSection[] = [];
   for (const section of parsed) {
     process.stdout.write(`  [${section.order}] ${section.title} ... `);
-    const result = await classifySection(section, creatureNames);
-    console.log(`${result.type}, ${result.reveals.length} reveal(s), refs: [${result.creature_references.join(", ")}]`);
+    const result = await classifySection(section, creatureNames, moduleId);
+    console.log(
+      `${result.type}, ${result.read_alouds.length} read-aloud(s), ${result.reveals.length} check(s), ` +
+        `${result.conditionals.length} conditional(s), ${result.prompts.length} prompt(s), ` +
+        `${result.technique.length} technique, ${result.features.length} feature(s)`
+    );
 
     const refs = result.creature_references
       .map((name) => creatureSections.find((c) => (c.stat_block as { name: string }).name === name)?.id)
@@ -139,10 +158,18 @@ async function main() {
       heading_path: section.headingPath,
       order: section.order,
       type: result.type,
-      read_aloud_text: result.read_aloud_text,
-      dm_only_text: result.dm_only_text,
+      // Derived server-side from the blocks; sent empty so the worker owns the
+      // single definition of how they are composed.
+      read_aloud_text: "",
+      dm_only_text: "",
       reveals: result.reveals,
       references: refs,
+      read_alouds: result.read_alouds,
+      background_text: result.background_text,
+      prompts: result.prompts,
+      technique: result.technique,
+      conditionals: result.conditionals,
+      features: result.features,
     });
   }
 

@@ -7,7 +7,9 @@
     "pilot": "tsx src/run.ts --chapter=1",
     "load:creatures": "tsx src/run.ts --creatures-only",
     "ingest:all": "tsx src/run.ts --chapter=all",
-    "ingest:srd": "tsx src/ingestSrd.ts"
+    "ingest:srd": "tsx src/ingestSrd.ts",
+    "verify": "tsx src/verify.ts",
+    "ingest:dosi": "tsx src/run.ts --module=dosi --chapter=all"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
