@@ -1,0 +1,164 @@
+[
+  {
+    "id": "1-a5-temple-of-bahamut",
+    "chapter": "Chapter 1: Dragon's Rest",
+    "heading": "A5: Temple of Bahamut",
+    "heading_path": ["Chapter 1: Dragon's Rest", "Welcome to Dragon's Rest", "Dragon's Rest Locations"],
+    "order": 32,
+    "type": "location",
+    "read_alouds": [
+      {
+        "ordinal": 0,
+        "source": "book",
+        "cue": "On first reaching the temple",
+        "text": "The highest point of the cloister is crowned by an open-air temple that overhangs the cliff, supported by arched stone struts anchored to the cliff face. The north wall of the temple is carved directly into the rock, while the rest is open to the sea air. Heavy pillars mark the three open sides, supporting the wooden roof. In the center of the temple stands a stone statue of a kind-looking old man with canaries perched on his hands, shoulders, and head. A feeling of serenity suffuses the place."
+      },
+      {
+        "ordinal": 1,
+        "source": "authored",
+        "cue": "Optional atmosphere — layer in after the boxed text, or use if the party lingers",
+        "text": "Wind comes off the water and moves through the pillars without ever quite becoming a sound; overhead, the roof beams answer it with a slow, settling creak. Salt hangs in the air, cut with the sweeter smoke of incense burning low in the four hollows of the pedestal. The stone underfoot has held the day's warmth, and far below, the sea works at the cliff in a rhythm felt through the soles of your boots more than heard. The carved canaries watch the horizon, patient as the rock they were cut from."
+      }
+    ],
+    "background_text": "The temple is very simple, with the statue (represented by the star-in-a-circle symbol on the map) as its only furnishing. The statue depicts Bahamut, the Platinum Dragon, in mortal disguise, surrounded by seven canaries that represent gold dragons who accompany him on his travels.\n\nDepressions in the statue's pedestal at the four cardinal directions hold offerings of incense made to Bahamut. Runara spends about half her time here, tending and maintaining the temple, offering prayers and incense, or in quiet contemplation. Other residents of the cloister help her, most often Varnoth and the kobold Rix.\n\nThe feeling of serenity that pervades the temple is the result of protective magic. Runara is the only inhabitant of Dragon's Rest who knows that this is a lingering effect of the death of a dragon on this site — her father, Astalagan.\n\nAbout Bahamut. Known as the Platinum Dragon, Bahamut is the patron and progenitor of metallic dragons. Adventurers and dragons alike pray to Bahamut to uphold honor and justice, or when they need courage to face a great threat. He seldom interferes in the affairs of mortal creatures, though he makes exceptions to help thwart the machinations of Tiamat the Dragon Queen and the evil dragons that serve her.",
+    "prompts": [],
+    "conditionals": [],
+    "checks": [
+      {
+        "ordinal": 0,
+        "context": "Examining the statue",
+        "skills": ["Intelligence (Religion)"],
+        "dc": 10,
+        "passive": false,
+        "kind": "info",
+        "cost": "",
+        "success_text": "Recognizes the statue as Bahamut, the Platinum Dragon, in mortal disguise. The seven canaries represent gold dragons who accompany him on his travels.",
+        "fail_text": ""
+      },
+      {
+        "ordinal": 1,
+        "context": "Asking any resident of Dragon's Rest about the statue",
+        "skills": [],
+        "dc": null,
+        "passive": false,
+        "kind": "info",
+        "cost": "",
+        "success_text": "The resident identifies Bahamut. No check required — this is the bypass for a failed Religion check.",
+        "fail_text": ""
+      },
+      {
+        "ordinal": 2,
+        "context": "Casting detect magic in the temple",
+        "skills": [],
+        "dc": null,
+        "passive": false,
+        "kind": "info",
+        "cost": "",
+        "success_text": "The spell reveals a faint aura around the statue. Only Runara knows its true source.",
+        "fail_text": ""
+      }
+    ],
+    "features": [
+      {
+        "ordinal": 0,
+        "name": "Sanctuary of Bahamut",
+        "text": "A non-evil creature who makes a saving throw within the temple can roll a d4 and add the number rolled to the saving throw."
+      }
+    ],
+    "references": ["creature-runara", "creature-varnoth"]
+  },
+  {
+    "id": "2-b2-fungus-farm",
+    "chapter": "Chapter 2: Seagrow Caves",
+    "heading": "B2: Fungus Farm",
+    "heading_path": ["Chapter 2: Seagrow Caves", "Running This Chapter", "Seagrow Caves Locations"],
+    "order": 64,
+    "type": "location",
+    "read_alouds": [
+      {
+        "ordinal": 0,
+        "source": "book",
+        "cue": "On first entering the cavern",
+        "text": "This fifty-foot-high cavern is a forest of multicolored fungi, ranging from tiny filaments to tree-sized mushrooms. A natural staircase of stone columns along the east wall leads up ten feet to a higher cave area in the north. Water burbles down from that upper cave and collects in a large pool. Two small mushroom-like people are working amid the mushrooms near the pond. A sickening smell, like sulfur, hangs in the air."
+      },
+      {
+        "ordinal": 1,
+        "source": "book",
+        "cue": "When the characters advance toward the myconids and the first violet fungus animates",
+        "text": "As you advance into the cave, a sickly looking mushroom suddenly stirs to life. It extends long purple tendrils toward you and moves slowly across the cave floor on root-like tendrils."
+      },
+      {
+        "ordinal": 2,
+        "source": "authored",
+        "cue": "Optional atmosphere — layer in after the boxed text, or use while the party explores before combat",
+        "text": "The air is warm and wet enough to sit on the skin, thick with the sulfur reek and something earthier beneath it — wet loam and rot. Sound behaves strangely under fifty feet of stone: the burble of falling water arrives flattened and close, while footsteps vanish into the spongy mat of the cavern floor. Spores drift through the glow like slow dust, catching the light from the caps overhead. Everything here is soft — the ground gives underfoot, the stalks bend aside at a touch — and nothing in the cavern moves except the water and the two small figures stooped among the mushrooms."
+      }
+    ],
+    "background_text": "The waterfall is fed from a pool in the upper cave, which in turn is supplied by runoff trickling down from the surface. Both pools are 5 feet deep at most.\n\nThe two mushroom people are myconid sprouts named Molen and Kraz. They are spreading fertilizer from area B3, while two myconid adults named Hipsiz and Rugoso tend the mushrooms near the upper pool, out of sight from below. All four myconids are oblivious to the true threat in the cave — three violet fungi that grow among the harmless mushrooms here.\n\nRunning the Combat. Because the violet fungi move so slowly, it's easy for the characters to stay out of their reach and kill the fungus monsters with ranged attacks. The interesting part of this encounter is identifying the danger. You don't need to keep track of exactly where everyone is standing in the room. Instead, rely on your sense of what's fun and exciting. If a character scans the fungus farm looking for more violet fungi, cast as much doubt as you can: many of the fungi look sickly and purple but pose no danger.\n\nMyconids. The myconid sprouts avoid the characters and the violet fungi.",
+    "prompts": [],
+    "conditionals": [
+      {
+        "ordinal": 0,
+        "kind": "trigger",
+        "condition": "The characters move into the cave toward the myconids",
+        "effect": "One violet fungus attacks, extending long tendrils that cause immediate rot when they touch living flesh. Read the second read-aloud."
+      },
+      {
+        "ordinal": 1,
+        "kind": "trigger",
+        "condition": "A character moves close to either of the two still-motionless violet fungi",
+        "effect": "That fungus animates and attacks. Only one fungus moves at the start of the encounter; the other two stay motionless until approached."
+      },
+      {
+        "ordinal": 2,
+        "kind": "trigger",
+        "condition": "A character moves away from an active violet fungus",
+        "effect": "Have another fungus stir and attack that character on the fungus's next turn."
+      },
+      {
+        "ordinal": 3,
+        "kind": "trigger",
+        "condition": "The myconid adults become aware of danger — through combat noise or the sprouts' Distress Spores",
+        "effect": "They move as quickly as they can to protect the sprouts."
+      },
+      {
+        "ordinal": 4,
+        "kind": "branch",
+        "condition": "The characters defeat the violet fungi",
+        "effect": "The myconids' attitude improves to indifferent and they will speak to the characters using Rapport Spores. The adults agree to accompany the characters and vouch for them with the rest of the colony, improving the other myconids' attitude to indifferent as well."
+      },
+      {
+        "ordinal": 5,
+        "kind": "variant",
+        "condition": "The characters are 2nd level",
+        "effect": "Add two violet fungi to this encounter."
+      }
+    ],
+    "checks": [
+      {
+        "ordinal": 0,
+        "context": "Searching the chamber for useful fungi",
+        "skills": ["Intelligence (Nature)", "Wisdom (Survival)"],
+        "dc": 12,
+        "passive": false,
+        "kind": "discovery",
+        "cost": "15 minutes",
+        "success_text": "Finds 1d6 heart cap mushrooms — reddish, and bearing an unsettling resemblance to human hearts. Tarak can make each one into a potion of healing.",
+        "fail_text": ""
+      },
+      {
+        "ordinal": 1,
+        "context": "Examining any of the fungi",
+        "skills": [],
+        "dc": null,
+        "passive": false,
+        "kind": "info",
+        "cost": "",
+        "success_text": "Many of the mushrooms are sickly, shriveled, and blotched with black patches of decay. The blight has no obvious source.",
+        "fail_text": ""
+      }
+    ],
+    "features": [],
+    "references": ["creature-myconid-sprout", "creature-myconid-adult", "creature-violet-fungus"]
+  }
+]
