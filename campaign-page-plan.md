@@ -11,6 +11,27 @@ per section:
 5. What players can learn from skill checks
 6. Scene-setting read-alouds — immersive detail, authored ahead of time
 
+## 0. Codebase context
+
+This branch is based on `claude/dnd-webapp-changes-y71v7g`, which is what runs
+in production — **not** `main`, which sits 13 commits behind it. That branch
+added auth and multi-campaign support, character sheets, an SRD library, battle
+maps with tokens and fog of war, a numbered migration chain, and generalised
+ingestion to a `module_id` (Lost Mine of Phandelver is registered as a second
+module in 0008).
+
+Two consequences for this plan:
+
+- Schema changes are **migrations**, not edits to `worker/schema.sql`.
+- Anything stateful is **per-campaign**, following the `reveal_defs` /
+  `campaign_reveal_state` split. New content tables are static definitions keyed
+  off `section_id` (and inherit module scoping from `sections.module_id`); only
+  DM progress is campaign-scoped.
+
+The Campaign page itself is almost untouched by all that work — `CampaignView.tsx`
+differs from `main` by 8 lines, all of it campaign-id scoping — so the analysis
+below applies to the live code as written.
+
 ## 1. Why the current structure can't carry them
 
 **Three needs share one column.** DM-only info, directives, and conditionals all
@@ -52,14 +73,21 @@ assumes all are "succeed → learn info":
 protects you at the table but fights you while prepping, when you need to read
 everything.
 
-**Two bugs to fix in passing:**
+**A live bug this plan must not trip over.** Migration 0001 split `reveals` into
+`reveal_defs` (static) plus `campaign_reveal_state (campaign_id, reveal_def_id,
+revealed, revealed_at)` so two campaigns on the same module don't share toggles.
+But `upsertSection` still does:
 
-- `upsertSection` deletes and re-inserts reveals, and `revealed` is keyed to an
-  autoincrement id — **re-ingesting wipes revealed flags mid-campaign.**
-- The worker at `dosi-dm-companion-worker.therealgarrettwells.workers.dev` 404s
-  on `/api/campaign`, `/api/search`, and `/api/creatures`, and returns CORS
-  headers that don't match this codebase. Worth confirming where the live app
-  points before any deploy.
+```sql
+DELETE FROM reveal_defs WHERE section_id = ?;   -- then re-INSERT
+```
+
+The re-inserted rows get **new autoincrement ids**, so every
+`campaign_reveal_state` row is left pointing at a deleted `reveal_def_id`.
+Per-campaign progress silently orphans and every reveal reads as un-revealed.
+The migration preserved state carefully; the ingest path throws it away. This
+matters directly because Phase 3 is a full re-ingest — it must land with a
+stable key first.
 
 ## 2. Content model
 
@@ -122,21 +150,20 @@ CREATE TABLE conditionals (
   effect TEXT NOT NULL            -- "six stirges emerge and attack"
 );
 
-CREATE TABLE checks (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  section_id TEXT NOT NULL REFERENCES sections(id),
-  ordinal INTEGER NOT NULL,
-  context TEXT NOT NULL DEFAULT '', -- the action that prompts it: "Examining the statue"
-  skills TEXT NOT NULL,           -- JSON: ["Intelligence (Nature)","Wisdom (Survival)"]
-  dc INTEGER,                     -- nullable: no-roll, contested, or passive
-  passive INTEGER NOT NULL DEFAULT 0,
-  kind TEXT NOT NULL CHECK (kind IN ('info','discovery','social','consequence')),
-  cost TEXT NOT NULL DEFAULT '',  -- "15 minutes"
-  success_text TEXT NOT NULL,
-  fail_text TEXT NOT NULL DEFAULT '',
-  revealed INTEGER NOT NULL DEFAULT 0
-);
-CREATE UNIQUE INDEX idx_checks_stable ON checks(section_id, ordinal);
+-- Checks EXTEND reveal_defs in place rather than becoming a new table, so the
+-- existing campaign_reveal_state rows (and the DM's progress) survive.
+ALTER TABLE reveal_defs ADD COLUMN ordinal INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE reveal_defs ADD COLUMN context TEXT NOT NULL DEFAULT '';
+ALTER TABLE reveal_defs ADD COLUMN skills TEXT NOT NULL DEFAULT '[]';  -- JSON array
+ALTER TABLE reveal_defs ADD COLUMN kind TEXT NOT NULL DEFAULT 'info';
+ALTER TABLE reveal_defs ADD COLUMN cost TEXT NOT NULL DEFAULT '';
+ALTER TABLE reveal_defs ADD COLUMN fail_text TEXT NOT NULL DEFAULT '';
+ALTER TABLE reveal_defs ADD COLUMN passive INTEGER NOT NULL DEFAULT 0;
+-- trigger_dc becomes nullable for no-roll routes; trigger_skill is superseded
+-- by skills[] and backfilled into it.
+
+-- The stable key that stops re-ingest from orphaning campaign_reveal_state.
+CREATE UNIQUE INDEX idx_reveal_defs_stable ON reveal_defs(section_id, ordinal);
 
 CREATE TABLE features (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -155,7 +182,11 @@ CREATE TABLE technique (
 );
 ```
 
-`checks.context` separates *what the character is doing* from *what it costs* —
+All of the above ships as **migration `0011_campaign_blocks.sql`** — the repo has
+a numbered migration chain (0001–0010) and `worker/schema.sql` is no longer the
+source of truth.
+
+`reveal_defs.context` separates *what the character is doing* from *what it costs* —
 "Examining the statue" vs. "15 minutes". The UI reads as
 `Examining the statue — DC 10 Intelligence (Religion) → recognizes Bahamut`.
 `dc` is nullable because several information routes need no roll at all.
@@ -318,9 +349,10 @@ Hand-authored B2: Fungus Farm and A5: Temple of Bahamut in the new JSON shape.
 No API spend, and the hand-authored version becomes the accuracy yardstick for
 Phase 3. Findings in §7.
 
-**Phase 1 — schema + worker.** New tables, migration, `getCampaignSections`
-returns blocks, `/api/checks/:id/toggle` replaces the reveal toggle. Load the
-fixture through `/admin/load-sections`.
+**Phase 1 — schema + worker.** Migration `0011_campaign_blocks.sql`, stable
+`(section_id, ordinal)` key on `reveal_defs` plus an `upsertSection` rewrite so
+re-ingest stops orphaning `campaign_reveal_state`, and `getCampaignSections`
+returning blocks. Load the fixture through `/admin/load-sections`.
 
 **Phase 2 — layout.** Two-pane shell, block components, prep strip, prep/run
 mode, density chips. Built against the fixture — this is the point to react to
