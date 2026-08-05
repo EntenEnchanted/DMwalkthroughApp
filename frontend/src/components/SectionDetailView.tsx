@@ -3,20 +3,10 @@ import type { SectionDetail } from "../types";
 import { toggleReveal } from "../api";
 import { useCampaignId } from "../CampaignContext";
 import { usePopup } from "../PopupContext";
-import { renderDmText } from "../dmText";
-import { hasBlocks, sectionCounts } from "../sectionCounts";
-import {
-  BackgroundBlock,
-  ChecksBlock,
-  ConditionalsBlock,
-  FeaturesBlock,
-  PromptsBlock,
-  ReadAloudBlock,
-  SceneBlock,
-  TechniqueBlock,
-} from "./SectionBlocks";
+import { sectionCounts, variantApplies } from "../sectionCounts";
+import { SectionBody } from "./SectionBody";
 
-function PrepStrip({ section }: { section: SectionDetail }) {
+function PrepStrip({ section, partyLevel }: { section: SectionDetail; partyLevel: number | null }) {
   const c = sectionCounts(section);
   const parts: string[] = [];
   if (c.readAlouds) parts.push(`${c.readAlouds} read-aloud${c.readAlouds > 1 ? "s" : ""}`);
@@ -26,9 +16,11 @@ function PrepStrip({ section }: { section: SectionDetail }) {
   if (c.branches) parts.push(`${c.branches} branch${c.branches > 1 ? "es" : ""}`);
   if (section.references.length) parts.push(`${section.references.length} creatures`);
 
-  const variants = (section.conditionals ?? []).filter((v) => v.kind === "variant");
+  const allVariants = (section.conditionals ?? []).filter((v) => v.kind === "variant");
+  const variants = allVariants.filter((v) => variantApplies(v.condition, partyLevel));
+  const hidden = allVariants.length - variants.length;
 
-  if (parts.length === 0 && variants.length === 0) return null;
+  if (parts.length === 0 && variants.length === 0 && hidden === 0) return null;
 
   return (
     <div className="prep-strip">
@@ -38,6 +30,11 @@ function PrepStrip({ section }: { section: SectionDetail }) {
           <strong>{v.condition}</strong> → {v.effect}
         </p>
       ))}
+      {hidden > 0 && (
+        <p className="prep-hidden-note">
+          {hidden} variant{hidden > 1 ? "s" : ""} for another party level hidden
+        </p>
+      )}
     </div>
   );
 }
@@ -45,9 +42,11 @@ function PrepStrip({ section }: { section: SectionDetail }) {
 export function SectionDetailView({
   section,
   runMode,
+  partyLevel,
 }: {
   section: SectionDetail;
   runMode: boolean;
+  partyLevel: number | null;
 }) {
   const campaignId = useCampaignId();
   const { openSection } = usePopup();
@@ -57,10 +56,6 @@ export function SectionDetailView({
     setReveals((prev) => prev.map((r) => (r.id === revealId ? { ...r, revealed: next } : r)));
     await toggleReveal(campaignId, revealId, next);
   }
-
-  const readAlouds = section.read_alouds ?? [];
-  const conditionals = section.conditionals ?? [];
-  const structured = hasBlocks(section);
 
   return (
     <article className="section-detail">
@@ -72,43 +67,9 @@ export function SectionDetailView({
         </h2>
       </header>
 
-      <PrepStrip section={section} />
+      <PrepStrip section={section} partyLevel={partyLevel} />
 
-      {structured ? (
-        <>
-          {/* Ordered as a room is actually run. */}
-          <SceneBlock items={readAlouds.filter((r) => r.source === "authored")} />
-          <ReadAloudBlock items={readAlouds.filter((r) => r.source === "book")} />
-          <PromptsBlock items={section.prompts ?? []} />
-          <ConditionalsBlock items={conditionals} kind="trigger" />
-          <ConditionalsBlock items={conditionals} kind="branch" />
-          {/* Variants are resolved once, before play — the prep strip carries them. */}
-          <ChecksBlock items={reveals} runMode={runMode} onToggle={handleToggle} />
-          <FeaturesBlock items={section.features ?? []} />
-          <TechniqueBlock items={section.technique ?? []} />
-          <BackgroundBlock text={section.background_text ?? ""} />
-        </>
-      ) : (
-        <>
-          {/*
-            Legacy path for modules not yet through the block classifier. Keeps
-            LMoP fully usable while DoSI migrates first.
-          */}
-          {section.read_aloud_text && (
-            <section className="block block-read-aloud">
-              <h4 className="block-label">Read aloud</h4>
-              <p className="read-aloud-text">{section.read_aloud_text}</p>
-            </section>
-          )}
-          {section.dm_only_text && (
-            <section className="block block-background">
-              <h4 className="block-label">DM only</h4>
-              <div className="legacy-dm-text">{renderDmText(section.dm_only_text)}</div>
-            </section>
-          )}
-          <ChecksBlock items={reveals} runMode={runMode} onToggle={handleToggle} />
-        </>
-      )}
+      <SectionBody section={section} reveals={reveals} runMode={runMode} onToggle={handleToggle} />
 
       {section.references.length > 0 && (
         <section className="block block-refs">

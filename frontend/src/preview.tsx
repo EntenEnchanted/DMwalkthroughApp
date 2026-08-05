@@ -134,7 +134,7 @@ function Preview({ runMode, selectedIndex }: { runMode: boolean; selectedIndex: 
             />
           </aside>
           <main className="detail-pane">
-            <SectionDetailView section={selected} runMode={runMode} />
+            <SectionDetailView section={selected} runMode={runMode} partyLevel={null} />
           </main>
         </div>
       </div>

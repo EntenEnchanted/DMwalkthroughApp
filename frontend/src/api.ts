@@ -103,6 +103,10 @@ export async function listCampaigns(): Promise<Campaign[]> {
   return data.campaigns;
 }
 
+export async function setPartyLevel(campaignId: string, level: number | null): Promise<void> {
+  await apiPost(`/api/campaigns/${encodeURIComponent(campaignId)}/party-level`, { party_level: level });
+}
+
 export async function createCampaign(name: string, moduleId: string): Promise<Campaign> {
   return (await apiPost("/api/campaigns", { name, module_id: moduleId })).json();
 }

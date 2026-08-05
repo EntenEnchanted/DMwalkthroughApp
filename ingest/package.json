@@ -10,7 +10,8 @@
     "ingest:srd": "tsx src/ingestSrd.ts",
     "verify": "tsx src/verify.ts",
     "ingest:dosi": "tsx src/run.ts --module=dosi --chapter=all",
-    "scene": "tsx src/scene.ts"
+    "scene": "tsx src/scene.ts",
+    "remigrate": "tsx src/remigrate.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",

@@ -31,3 +31,15 @@ export function sectionCounts(s: SectionDetail) {
     technique: (s.technique ?? []).length,
   };
 }
+
+/**
+ * Level-scaling variants read like "The characters are 2nd level". When the DM
+ * has set a party level, variants naming a different level are irrelevant and
+ * would only be noise on the prep strip. Variants that name no level always
+ * apply — party size or a class being present, say — so they are always kept.
+ */
+export function variantApplies(condition: string, partyLevel: number | null): boolean {
+  if (partyLevel === null) return true;
+  const m = /\b(\d+)(?:st|nd|rd|th)?[-\s]level\b/i.exec(condition);
+  return m ? Number(m[1]) === partyLevel : true;
+}

@@ -20,6 +20,8 @@ export interface Campaign {
   module_name: string;
   status: string;
   created_at: number;
+  /** null when unset; the Campaign page then shows every level variant. */
+  party_level: number | null;
 }
 
 export type CheckKind = "info" | "discovery" | "social" | "consequence";

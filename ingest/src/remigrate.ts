@@ -1,0 +1,135 @@
+/**
+ * Migrates an already-ingested module to the block model, reading from the text
+ * stored in D1 rather than the original source markdown.
+ *
+ * LMoP was ingested from a source file that was never committed, so the original
+ * pipeline cannot be re-run for it. The content is in the database, though, which
+ * makes this the more durable shape anyway: block migration becomes a property of
+ * the data rather than of whoever still holds the markdown.
+ *
+ *   npm run remigrate -- <dumped-sections.json> <module_id>
+ */
+import "dotenv/config";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { classifySection } from "./classify.js";
+import type { Reveal } from "./types.js";
+
+interface StoredSection {
+  id: string;
+  chapter: string;
+  heading: string;
+  heading_path: string[];
+  order: number;
+  type: string;
+  dm_only_text: string;
+  read_aloud_text: string;
+  reveals: { trigger_skill: string; trigger_dc: number; text: string }[];
+}
+
+/** Legacy inline markup from the pre-block classifier — keep the text, drop the tags. */
+function stripLegacyMarkup(text: string): string {
+  return text
+    .replace(/<\/?cond>/g, "")
+    .replace(/\[\[\/?directive\]\]/g, "")
+    .trim();
+}
+
+/**
+ * Rebuilds something the classifier can read from the already-split fields.
+ * The bracketed labels are structural hints; the prompt is told not to echo them.
+ */
+function reconstruct(section: StoredSection): string {
+  const parts: string[] = [];
+  if (section.read_aloud_text.trim()) {
+    parts.push(`[Read-aloud passage, as printed in the adventure]\n${section.read_aloud_text.trim()}`);
+  }
+  if (section.dm_only_text.trim()) {
+    parts.push(`[DM-facing text]\n${stripLegacyMarkup(section.dm_only_text)}`);
+  }
+  if (section.reveals.length) {
+    const lines = section.reveals
+      .map((r) => `- DC ${r.trigger_dc} ${r.trigger_skill}: ${r.text}`)
+      .join("\n");
+    parts.push(`[Information the adventure gates behind ability checks]\n${lines}`);
+  }
+  return parts.join("\n\n");
+}
+
+async function main() {
+  const [sourcePath, moduleId] = process.argv.slice(2);
+  if (!sourcePath || !moduleId) {
+    console.error("usage: npm run remigrate -- <dumped-sections.json> <module_id>");
+    process.exit(1);
+  }
+
+  const sections = JSON.parse(readFileSync(sourcePath, "utf-8")) as StoredSection[];
+  console.log(`Re-classifying ${sections.length} ${moduleId} sections from stored text...`);
+
+  const output = [];
+  let revealsBefore = 0;
+  let checksAfter = 0;
+  const lostReveals: string[] = [];
+
+  for (const section of sections) {
+    process.stdout.write(`  ${section.heading.slice(0, 44).padEnd(44)} `);
+    const result = await classifySection(
+      {
+        order: section.order,
+        level: section.heading_path.length,
+        title: section.heading,
+        chapter: section.chapter,
+        headingPath: section.heading_path,
+        rawText: reconstruct(section),
+      },
+      // LMoP has no creature stat blocks loaded, so there is nothing to link to.
+      [],
+      `${moduleId}-stored`
+    );
+
+    revealsBefore += section.reveals.length;
+    checksAfter += result.reveals.length;
+    if (result.reveals.length < section.reveals.length) lostReveals.push(section.id);
+
+    console.log(
+      `${result.read_alouds.length} ra, ${result.reveals.length} ck, ${result.conditionals.length} cond, ` +
+        `${result.prompts.length} pr, ${result.technique.length} tq, ${result.features.length} ft`
+    );
+
+    output.push({
+      id: section.id,
+      module_id: moduleId,
+      chapter: section.chapter,
+      heading: section.heading,
+      heading_path: section.heading_path,
+      order: section.order,
+      // The existing types were reviewed during the original ingestion; keep them
+      // rather than letting a second opinion churn them.
+      type: section.type,
+      read_aloud_text: "",
+      dm_only_text: "",
+      reveals: result.reveals as Reveal[],
+      references: [] as string[],
+      read_alouds: result.read_alouds,
+      background_text: result.background_text,
+      prompts: result.prompts,
+      technique: result.technique,
+      conditionals: result.conditionals,
+      features: result.features,
+    });
+  }
+
+  mkdirSync("./output", { recursive: true });
+  const outPath = `./output/${moduleId}-remigrated.json`;
+  writeFileSync(outPath, JSON.stringify(output, null, 2));
+  console.log(`\nWrote ${output.length} sections to ${outPath}`);
+  console.log(`checks: ${revealsBefore} before -> ${checksAfter} after`);
+  if (lostReveals.length) {
+    console.log(`${lostReveals.length} section(s) came back with fewer checks than they had reveals:`);
+    lostReveals.forEach((id) => console.log(`  ${id}`));
+  }
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

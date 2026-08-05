@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getCampaignOutline } from "../api";
+import { getCampaignOutline, listCampaigns, setPartyLevel } from "../api";
 import type { SectionDetail } from "../types";
 import { useCampaignId } from "../CampaignContext";
 import { CampaignOutline, type Chapter } from "./CampaignOutline";
@@ -33,6 +33,9 @@ export function CampaignView() {
   const [closedChapters, setClosedChapters] = useState<Set<string>>(new Set());
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>(() => (localStorage.getItem("campaignMode") as Mode) || "prep");
+  // Party level lives on the campaign, not in local storage: two campaigns on the
+  // same module can sit at different levels, and DoSI spans 1-2 where LMoP spans 1-5.
+  const [partyLevel, setLevel] = useState<number | null>(null);
 
   useEffect(() => {
     getCampaignOutline(campaignId).then((sections) => setChapters(groupByChapter(sections)));
@@ -41,6 +44,15 @@ export function CampaignView() {
   useEffect(() => {
     localStorage.setItem("campaignMode", mode);
   }, [mode]);
+
+  useEffect(() => {
+    listCampaigns().then((cs) => setLevel(cs.find((c) => c.id === campaignId)?.party_level ?? null));
+  }, [campaignId]);
+
+  function changeLevel(next: number | null) {
+    setLevel(next);
+    void setPartyLevel(campaignId, next);
+  }
 
   function toggleChapter(chapter: string) {
     setClosedChapters((prev) => {
@@ -68,6 +80,20 @@ export function CampaignView() {
             Run
           </button>
         </div>
+        <label className="party-level">
+          Party level
+          <select
+            value={partyLevel ?? ""}
+            onChange={(e) => changeLevel(e.target.value ? Number(e.target.value) : null)}
+          >
+            <option value="">Not set</option>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </label>
         <CampaignOutline
           chapters={chapters}
           selectedId={selectedId}
@@ -82,7 +108,12 @@ export function CampaignView() {
           ← Outline
         </button>
         {selected ? (
-          <SectionDetailView key={selected.id} section={selected} runMode={mode === "run"} />
+          <SectionDetailView
+            key={selected.id}
+            section={selected}
+            runMode={mode === "run"}
+            partyLevel={partyLevel}
+          />
         ) : (
           <div className="empty-state">Pick a section from the outline.</div>
         )}

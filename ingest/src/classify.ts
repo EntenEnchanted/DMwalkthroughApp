@@ -21,6 +21,13 @@ the block; strip the delimiters themselves. It also uses bold run-in headers of 
 "***Treasure.***" or "***Running the Combat.***" to open a sub-topic. One of these recurs: \
 "***2nd-Level Characters.***" introduces an adjustment applied when the party is 2nd level rather \
 than 1st — that is a party-configuration variant.`,
+  "lmop-stored": `The text you are given has already been partially split by an earlier ingestion \
+pass, and the parts are marked with bracketed labels such as "[Read-aloud passage, as printed in the \
+adventure]", "[DM-facing text]" and "[Information the adventure gates behind ability checks]". Treat \
+those labels as structure only — never echo a label into your output. Trust the read-aloud label, but \
+do NOT assume the DM-facing part is homogeneous: it still contains sentences belonging to the more \
+specific categories, and the check-gated lines still need a context and an outcome teasing apart. This \
+module has no recurring level-scaling sidebar, so expect few or no party-configuration variants.`,
   lmop: `This module's read-aloud text is set off as indented or quoted blocks. It uses bold run-in \
 headers to open a sub-topic. It has no single recurring level-scaling sidebar, so expect few or no \
 party-configuration variants — do not invent them.`,

@@ -9,7 +9,12 @@ import { handleClassify } from "./routes/classify.js";
 import { handleGetCampaignOutline } from "./routes/campaign.js";
 import { handleGetCreatures } from "./routes/creatures.js";
 import { handleLogin, handleLogout, handleMe } from "./routes/auth.js";
-import { handleListModules, handleListCampaigns, handleCreateCampaign } from "./routes/campaigns.js";
+import {
+  handleListModules,
+  handleListCampaigns,
+  handleCreateCampaign,
+  handleSetPartyLevel,
+} from "./routes/campaigns.js";
 import { handleGetOrCreateInvite, handleRedeemInvite } from "./routes/invites.js";
 import { handleGetOrCreateDmInvite, handleRegisterDm } from "./routes/dmInvites.js";
 import {
@@ -131,7 +136,9 @@ export default {
         const narrativeMatch = /^sections\/([^/]+)\/narrative-references$/.exec(sub);
         const revealMatch = /^reveals\/([^/]+)\/toggle$/.exec(sub);
 
-        if (sub === "invite" && request.method === "POST") {
+        if (sub === "party-level" && request.method === "POST") {
+          response = await handleSetPartyLevel(campaignId, request, env);
+        } else if (sub === "invite" && request.method === "POST") {
           response = await handleGetOrCreateInvite(campaignId, request, env);
         } else if (sub === "maps/upload-image" && request.method === "POST") {
           response = await handleUploadMapImage(campaignId, request, env);

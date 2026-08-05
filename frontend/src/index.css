@@ -1414,3 +1414,26 @@ input {
     display: none;
   }
 }
+
+.party-level {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 0.76rem;
+  color: var(--text-dim);
+}
+.party-level select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  font-size: 0.8rem;
+}
+.prep-hidden-note {
+  margin: 6px 0 0;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
