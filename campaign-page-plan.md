@@ -13,12 +13,15 @@ per section:
 
 ## 0. Codebase context
 
-This branch is based on `claude/dnd-webapp-changes-y71v7g`, which is what runs
-in production — **not** `main`, which sits 13 commits behind it. That branch
-added auth and multi-campaign support, character sheets, an SRD library, battle
-maps with tokens and fog of war, a numbered migration chain, and generalised
-ingestion to a `module_id` (Lost Mine of Phandelver is registered as a second
-module in 0008).
+This work sits on top of the app as it runs in production: auth and
+multi-campaign support, character sheets, an SRD library, battle maps with
+tokens and fog of war, a numbered migration chain, and ingestion generalised to a
+`module_id` (Lost Mine of Phandelver is registered as a second module in 0008).
+
+That code originally lived on `claude/dnd-webapp-changes-y71v7g` while `main` sat
+13 commits behind it, which is how this branch came to be cut from a stale base.
+`main` was fast-forwarded to it during this session, so `main` is now the correct
+base for future branches — check it is current before branching.
 
 Two consequences for this plan:
 
@@ -27,10 +30,6 @@ Two consequences for this plan:
   `campaign_reveal_state` split. New content tables are static definitions keyed
   off `section_id` (and inherit module scoping from `sections.module_id`); only
   DM progress is campaign-scoped.
-
-The Campaign page itself is almost untouched by all that work — `CampaignView.tsx`
-differs from `main` by 8 lines, all of it campaign-id scoping — so the analysis
-below applies to the live code as written.
 
 ## 1. Why the current structure can't carry them
 
@@ -342,34 +341,72 @@ Migrating those consumers is optional later work, not a prerequisite.
 still ships in one response; if payload size becomes a problem, split into a
 lightweight outline index plus lazy per-section fetch.
 
-## 6. Phasing
+## 6. Status
 
-**Phase 0 — fixture. _(done — `ingest/fixtures/phase0-sections.json`)_**
-Hand-authored B2: Fungus Farm and A5: Temple of Bahamut in the new JSON shape.
-No API spend, and the hand-authored version becomes the accuracy yardstick for
-Phase 3. Findings in §7.
+All six phases are built and deployed. Production runs this branch's code,
+deployed directly with `wrangler` — see the handover note at the end for how
+that relates to `main`.
 
-**Phase 1 — schema + worker.** Migration `0011_campaign_blocks.sql`, stable
-`(section_id, ordinal)` key on `reveal_defs` plus an `upsertSection` rewrite so
-re-ingest stops orphaning `campaign_reveal_state`, and `getCampaignSections`
-returning blocks. Load the fixture through `/admin/load-sections`.
+| Phase | State |
+|---|---|
+| 0 — fixture | done — `ingest/fixtures/phase0-sections.json` |
+| 1 — schema + worker | done — migration `0011`, applied to production D1 |
+| 2 — layout | done — two-pane, blocks, prep/run mode, density chips |
+| 3 — classify pass | done — DoSI's 130 sections classified and loaded |
+| 4 — scene pass | done for DoSI (29 rooms); **not run for LMoP** |
+| 5 — polish | done — `SectionBody`, party level (migration `0012`) |
+| 6 — LMoP migration | classification done (287 sections); scene pass outstanding |
 
-**Phase 2 — layout.** Two-pane shell, block components, prep strip, prep/run
-mode, density chips. Built against the fixture — this is the point to react to
-the shape before paying for re-ingest.
+### What is in production
 
-**Phase 3 — classify pass.** Rewrite the prompt and tool schema, re-run over all
-chapters (~120 sections), verify output against the Phase 0 fixture.
+```
+dosi   130 sections   82 read-alouds (53 book + 29 authored)   63 checks
+                      127 conditionals   44 technique   20 features
+lmop   287 sections   88 read-alouds (all book, no scene yet)  114 checks
+                      282 conditionals   90 technique   54 features
+```
 
-**Phase 4 — scene pass.** Separate script, locations only (~30 sections).
+DoSI produced 18 party-level variants and LMoP 2, which is the per-module
+convention hints (§8) working rather than a defect: LMoP has no level-scaling
+sidebar and its hint says so.
 
-**Phase 5 — polish.** Party level on the campaign record so variants resolve
-automatically, density chip tuning, reconciling the search view with the new
-blocks.
+### Outstanding
 
-**Phase 6 — LMoP migration.** Re-classify from stored text (§8), then scene-pass
-its locations. Independent of everything above and safe to defer — LMoP keeps
-rendering through the legacy path until this runs.
+1. **Scene pass for LMoP.** 75 of its locations have a book read-aloud and would
+   take scene text. `npm run scene -- <file>` operates on a classified sections
+   file, so this needs the module re-dumped from D1 first (see below) or the
+   `remigrate.ts` output regenerated — `ingest/output/` is not committed.
+2. **LMoP has no creature data.** 0 creature sections, 0 references, so its stat
+   block chips have never worked and the "Creatures here" block never renders.
+   Closing this needs an LMoP creature seed JSON equivalent to
+   `dosi-creatures-seed.json`, which is transcription work.
+3. **Technique is under-detected inside rooms.** B2 yields one entry where the
+   hand-authored fixture has three; the text is present but merged coarsely.
+   Prompt tuning — measure any change with `npm run verify`.
+
+### Running the pipeline again
+
+```bash
+# Dump a module's stored text (paged; D1 caps result size)
+npx wrangler d1 execute dosi-db --remote --json --config worker/wrangler.toml \
+  --command "SELECT id, chapter, heading, heading_path, \"order\", type,
+             dm_only_text, read_aloud_text FROM sections
+             WHERE module_id='lmop' AND type NOT IN ('creature','item')
+             ORDER BY \"order\" LIMIT 60 OFFSET 0"
+
+npm run remigrate -- <dump.json> lmop     # blocks from stored text, checkpointed
+npm run scene     -- <file.json>          # authored atmosphere for locations
+npm run verify    -- <file.json>          # score against the fixture
+npm run load      -- <file.json>          # into D1 + Vectorize, batched
+```
+
+Ingestion needs Anthropic access, which the session environment may not have.
+Either set `ANTHROPIC_API_KEY`, or re-add the temporary worker-side
+`/admin/classify` proxy (in git history) which uses the Worker's own secret —
+add it, run the pass, remove it, rotate `ADMIN_TOKEN`.
+
+`frontend/preview.html` renders the real Campaign components against the fixture
+with no API, deploy or ingest run — `npm run dev`, then `/preview.html`.
 
 ## 7. Phase 0 findings
 
