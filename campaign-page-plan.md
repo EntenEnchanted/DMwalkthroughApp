@@ -363,8 +363,13 @@ chapters (~120 sections), verify output against the Phase 0 fixture.
 
 **Phase 4 — scene pass.** Separate script, locations only (~30 sections).
 
-**Phase 5 — polish.** Party-level setting so variants resolve automatically,
-density chip tuning, reconciling the search view with the new blocks.
+**Phase 5 — polish.** Party level on the campaign record so variants resolve
+automatically, density chip tuning, reconciling the search view with the new
+blocks.
+
+**Phase 6 — LMoP migration.** Re-classify from stored text (§8), then scene-pass
+its locations. Independent of everything above and safe to defer — LMoP keeps
+rendering through the legacy path until this runs.
 
 ## 7. Phase 0 findings
 
@@ -393,9 +398,13 @@ learn here" — rather than scattering them into triggers.
 
 **Full extraction beats keeping inline spans.** The original plan kept the
 tagged sentence in the prose *and* extracted it. Writing it out, the leftover
-background reads fine without them and the duplication is just noise. Dropping
-the inline markup also removes `dmText.tsx` and the classifier's span-balance
-retry logic entirely.
+background reads fine without them and the duplication is just noise. New
+classifier output no longer emits inline markup at all.
+
+> **Correction.** An earlier version of this finding said dropping the markup
+> removes `dmText.tsx` outright. It can't — LMoP's 300 live sections still carry
+> inline-marked `dm_only_text` and no blocks. `dmText.tsx` stays as the legacy
+> rendering path until every module is migrated. See §8.
 
 **Both fixture sections have zero prompts — and that exposed an eighth block.**
 Neither section has anything the DM asks the players to do. B2's three pieces of
@@ -409,7 +418,81 @@ Expect `prompts[]` to be empty for most locations and concentrated in encounters
 and NPC introductions; expect `technique[]` to cluster in combat-bearing rooms
 and the front-matter DM guidance chapter.
 
-## 8. Risks
+## 8. Multiple modules
+
+Two modules are live: `dosi` (156 sections) and `lmop` (300 — 287 narrative plus
+13 magic items, 25 reveals). Any future adventure is a third. This section is
+about what the block model means for all of them.
+
+### The schema is module-agnostic, permanently
+
+Migration 0011 never mentions a module. Blocks key off `section_id`; scoping
+comes from `sections.module_id`, which `loadBlocks` filters on. So every module —
+LMoP today, anything added later — gets the block tables for free, and **no
+per-module schema work is ever needed.** Per-campaign progress is likewise
+already correct: `campaign_reveal_state` is keyed `(campaign_id, reveal_def_id)`,
+so two campaigns running LMoP have independent reveal state, and the stable
+ordinal key from Phase 1 protects it across re-ingests.
+
+### But blocks only exist where a classification pass has run
+
+LMoP's 300 sections have legacy `dm_only_text` carrying inline `<cond>` and
+`[[directive]]` markup, and zero blocks. **A blocks-only Campaign page would
+render an LMoP campaign as empty.**
+
+So Phase 2 needs a legacy path, not just a block path:
+
+```
+section has blocks  → render the block layout
+section has none    → render dm_only_text through renderDmText(), as today
+```
+
+This is a hard requirement, not a nicety — it's what lets DoSI migrate first
+while LMoP keeps working untouched. It also means `dmText.tsx` survives until
+every module is migrated.
+
+### Migrating an existing module doesn't need its source file
+
+**LMoP's source markdown is not in this repo** — it was ingested via `--source=`
+pointing at an uncommitted file, and the remote-ingestion scaffolding was
+deliberately removed afterwards (`d21152b`). Only DoSI's markdown is committed.
+
+That rules out re-running the original pipeline for LMoP, but not the migration:
+the content is already in D1. A **re-classify-from-stored-text pass** reads a
+section's `read_aloud_text`, `dm_only_text` and existing `reveal_defs` rows,
+splits them into blocks, and writes them back. No source file required.
+
+This is the better long-term shape anyway — it makes block migration a property
+of the database rather than of whoever still has the original markdown, and it
+works identically for any module added in future.
+
+### Per-module cost is independent
+
+Each module migrates on its own schedule; there's no flag day. LMoP's 287
+narrative sections are roughly 2.2× the DoSI pass, so a sensible order is DoSI
+first (its source is here, it's the smaller run, and the fixture yardstick
+covers it), then LMoP from stored text once the classifier output is trusted.
+
+### The classifier prompt must not encode DoSI's conventions
+
+This is the sharpest risk. The current prompt hardcodes DoSI's `>>` boxed-quote
+delimiter, and the plan's `variant` definition leans on
+`***2nd-Level Characters.***` — a DoSI-only sidebar that appears 8 times there
+and, being a 1st–2nd-level adventure, has no equivalent in LMoP's 1st–5th-level
+structure.
+
+Categories must therefore be defined **semantically**, with source conventions
+supplied as a per-module hint rather than baked into the system prompt. Expect
+`variant` to be sparse or empty for LMoP; that's correct behaviour, not a
+failure — blocks are optional and absent ones simply don't render.
+
+### Party-level resolution is per-campaign
+
+The prep strip resolving level variants needs the party's level. DoSI spans 1–2,
+LMoP spans 1–5, so this belongs on the **campaign** record, not as a global
+app setting.
+
+## 9. Risks
 
 - **Re-ingest overwrites everything.** Phase 3 replaces all classified content.
   Fixture-first exists to settle the target shape before that happens.
