@@ -22,20 +22,85 @@ export interface Campaign {
   created_at: number;
 }
 
+export type CheckKind = "info" | "discovery" | "social" | "consequence";
+export type ConditionalKind = "trigger" | "branch" | "variant";
+export type ReadAloudSource = "book" | "authored";
+
+/**
+ * A skill check. `dc: null` means the information needs no roll at all — asking
+ * an NPC, casting a spell, or simply examining something.
+ */
 export interface Reveal {
   id: number;
+  /** @deprecated superseded by `skills`; still read by search and the popup. */
   trigger_skill: string;
+  /** @deprecated superseded by `dc`; still read by search and the popup. */
   trigger_dc: number;
   text: string;
   revealed: boolean;
+  ordinal: number;
+  /** The action that prompts the check: "Examining the statue". */
+  context: string;
+  skills: string[];
+  dc: number | null;
+  passive: boolean;
+  kind: CheckKind;
+  /** Time or resources it costs: "15 minutes". */
+  cost: string;
+  fail_text: string;
 }
 
-export interface SectionDetail {
+export interface ReadAloud {
+  ordinal: number;
+  /** "book" is the adventure's own boxed text; "authored" is written scene-setting. */
+  source: ReadAloudSource;
+  /** When it fires: "when the fungus animates". */
+  cue: string;
+  text: string;
+}
+
+export interface Prompt {
+  ordinal: number;
+  text: string;
+}
+
+/** DM craft advice — how to perform the scene, not facts about it. */
+export interface Technique {
+  ordinal: number;
+  name: string;
+  text: string;
+}
+
+export interface Conditional {
+  ordinal: number;
+  kind: ConditionalKind;
+  condition: string;
+  effect: string;
+}
+
+/** A standing mechanical rule for an area: no trigger, no roll to discover. */
+export interface Feature {
+  ordinal: number;
+  name: string;
+  text: string;
+}
+
+export interface SectionBlocks {
+  read_alouds: ReadAloud[];
+  background_text: string;
+  prompts: Prompt[];
+  technique: Technique[];
+  conditionals: Conditional[];
+  features: Feature[];
+}
+
+export interface SectionDetail extends SectionBlocks {
   id: string;
   chapter: string;
   heading: string;
   heading_path: string[];
   type: SectionType;
+  /** Derived from the blocks. Search, chat and the stat block popup read these. */
   read_aloud_text: string;
   dm_only_text: string;
   reveals: Reveal[];
