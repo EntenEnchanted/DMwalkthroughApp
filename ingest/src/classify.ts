@@ -1,5 +1,11 @@
 import Anthropic from "@anthropic-ai/sdk";
-import type { ClassifiedBlocks, ClassifiedSection, ParsedSection, SectionType } from "./types.js";
+import type {
+  ClassifiedBlocks,
+  ClassifiedSection,
+  ConditionalKind,
+  ParsedSection,
+  SectionType,
+} from "./types.js";
 
 const MODEL = "claude-sonnet-5";
 
@@ -154,6 +160,15 @@ function looksCorrupted(text: string): boolean {
   return CORRUPTION_MARKERS.some((marker) => text.includes(marker));
 }
 
+/**
+ * Tool output is schema-constrained but not schema-guaranteed: a model can
+ * occasionally return a non-array where the schema says array, which crashes the
+ * whole run on one bad section. Coerce rather than trust.
+ */
+function arr<T>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : [];
+}
+
 /** Last-resort safety net: hard-truncate at the first marker rather than ever saving mangled output. */
 function sanitize(text: string): string {
   let cut = -1;
@@ -294,7 +309,7 @@ export async function classifySection(
 
   while (
     (looksCorrupted(result.background_text ?? "") ||
-      (result.read_alouds ?? []).some((r) => looksCorrupted(r.text ?? ""))) &&
+      arr<{ text?: string }>(result.read_alouds).some((r) => looksCorrupted(r.text ?? ""))) &&
     attempts < MAX_ATTEMPTS
   ) {
     result = await classifyOnce(section, creatureNames, moduleId);
@@ -304,7 +319,7 @@ export async function classifySection(
   // creature/item sections are generated separately from the seed data, never by this classifier
   const type: SectionType = result.type === "creature" || result.type === "item" ? "encounter" : result.type;
 
-  const readAlouds = (result.read_alouds ?? []).map((r, i) => ({
+  const readAlouds = arr<{ cue?: string; text?: string }>(result.read_alouds).map((r, i) => ({
     ordinal: i,
     source: "book" as const,
     cue: r.cue ?? "",
@@ -316,16 +331,16 @@ export async function classifySection(
     type,
     read_alouds: readAlouds,
     background_text: sanitize(result.background_text ?? ""),
-    prompts: (result.prompts ?? []).map((p, i) => ({ ordinal: i, text: p.text })),
-    technique: (result.technique ?? []).map((t, i) => ({ ordinal: i, name: t.name, text: t.text })),
-    conditionals: (result.conditionals ?? []).map((c, i) => ({
+    prompts: arr<{ text: string }>(result.prompts).map((p, i) => ({ ordinal: i, text: p.text })),
+    technique: arr<{ name: string; text: string }>(result.technique).map((t, i) => ({ ordinal: i, name: t.name, text: t.text })),
+    conditionals: arr<{ kind: ConditionalKind; condition: string; effect: string }>(result.conditionals).map((c, i) => ({
       ordinal: i,
       kind: c.kind,
       condition: c.condition,
       effect: c.effect,
     })),
-    features: (result.features ?? []).map((f, i) => ({ ordinal: i, name: f.name, text: f.text })),
-    reveals: (result.checks ?? []).map((c, i) => ({
+    features: arr<{ name: string; text: string }>(result.features).map((f, i) => ({ ordinal: i, name: f.name, text: f.text })),
+    reveals: arr<ClassifiedBlocks["checks"][number]>(result.checks).map((c, i) => ({
       ordinal: i,
       context: c.context ?? "",
       skills: c.skills ?? [],
@@ -340,6 +355,6 @@ export async function classifySection(
       trigger_skill: (c.skills ?? [])[0] ?? "",
       trigger_dc: typeof c.dc === "number" ? c.dc : 0,
     })),
-    creature_references: (result.creature_references ?? []).filter((n) => creatureNames.includes(n)),
+    creature_references: arr<string>(result.creature_references).filter((n) => creatureNames.includes(n)),
   };
 }

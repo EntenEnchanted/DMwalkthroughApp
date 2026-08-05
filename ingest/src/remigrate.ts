@@ -63,14 +63,26 @@ async function main() {
   }
 
   const sections = JSON.parse(readFileSync(sourcePath, "utf-8")) as StoredSection[];
-  console.log(`Re-classifying ${sections.length} ${moduleId} sections from stored text...`);
+  mkdirSync("./output", { recursive: true });
+  const outPath = `./output/${moduleId}-remigrated.json`;
 
-  const output = [];
+  // Resume from whatever a previous run got through. A single malformed tool
+  // response used to abort the whole pass and discard every section before it.
+  let output: Record<string, unknown>[] = [];
+  try {
+    output = JSON.parse(readFileSync(outPath, "utf-8")) as Record<string, unknown>[];
+  } catch {
+    /* no checkpoint yet */
+  }
+  const done = new Set(output.map((s) => s.id as string));
+  const todo = sections.filter((s) => !done.has(s.id));
+  if (done.size) console.log(`Resuming: ${done.size} already done, ${todo.length} to go.`);
+  console.log(`Re-classifying ${todo.length} ${moduleId} sections from stored text...`);
   let revealsBefore = 0;
   let checksAfter = 0;
   const lostReveals: string[] = [];
 
-  for (const section of sections) {
+  for (const section of todo) {
     process.stdout.write(`  ${section.heading.slice(0, 44).padEnd(44)} `);
     const result = await classifySection(
       {
@@ -116,10 +128,9 @@ async function main() {
       conditionals: result.conditionals,
       features: result.features,
     });
+    writeFileSync(outPath, JSON.stringify(output, null, 2));
   }
 
-  mkdirSync("./output", { recursive: true });
-  const outPath = `./output/${moduleId}-remigrated.json`;
   writeFileSync(outPath, JSON.stringify(output, null, 2));
   console.log(`\nWrote ${output.length} sections to ${outPath}`);
   console.log(`checks: ${revealsBefore} before -> ${checksAfter} after`);
