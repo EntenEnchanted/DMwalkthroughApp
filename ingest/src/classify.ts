@@ -105,6 +105,40 @@ function getClient(): Anthropic {
   return client;
 }
 
+/**
+ * When CLASSIFY_PROXY_URL and WORKER_ADMIN_TOKEN are set, requests go through
+ * the worker's temporary /admin/classify endpoint, which holds the Anthropic key
+ * as a Cloudflare secret. Otherwise a local ANTHROPIC_API_KEY is used directly.
+ */
+function proxyConfig(): { url: string; token: string } | null {
+  const url = process.env.CLASSIFY_PROXY_URL;
+  const token = process.env.WORKER_ADMIN_TOKEN;
+  return url && token ? { url, token } : null;
+}
+
+interface MessagesRequest {
+  model: string;
+  max_tokens: number;
+  system: string;
+  messages: { role: "user"; content: string }[];
+  tools: unknown[];
+  tool_choice: unknown;
+}
+
+async function sendMessages(payload: MessagesRequest): Promise<{ content: unknown[] }> {
+  const proxy = proxyConfig();
+  if (!proxy) {
+    return (await getClient().messages.create(payload as never)) as unknown as { content: unknown[] };
+  }
+  const res = await fetch(proxy.url, {
+    method: "POST",
+    headers: { "content-type": "application/json", "X-Admin-Token": proxy.token },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error(`classify proxy ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  return (await res.json()) as { content: unknown[] };
+}
+
 /** Truncated tool-call artifacts leaking into the text fields. */
 const CORRUPTION_MARKERS = ["</background_text>", "</read_aloud_text>", "</dm_only_text>", "<parameter"];
 const MAX_ATTEMPTS = 3;
@@ -216,7 +250,7 @@ async function classifyOnce(
   );
   const headingPath = [...section.headingPath, section.title].join(" > ");
 
-  const response = await getClient().messages.create({
+  const response = await sendMessages({
     model: MODEL,
     max_tokens: 8192,
     system,
@@ -236,8 +270,8 @@ async function classifyOnce(
     tool_choice: { type: "tool", name: "classify_section" },
   });
 
-  const toolUse = response.content.find((c) => c.type === "tool_use");
-  if (!toolUse || toolUse.type !== "tool_use") {
+  const toolUse = (response.content as { type: string; input?: unknown }[]).find((c) => c.type === "tool_use");
+  if (!toolUse?.input) {
     throw new Error(`No tool_use response for section: ${headingPath}`);
   }
   return toolUse.input as ClassifiedBlocks;
