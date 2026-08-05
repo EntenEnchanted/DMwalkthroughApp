@@ -78,6 +78,14 @@ need 2's "purely informational."
 | 4 Alters DM behaviour | `triggers[]` / `branches[]` / `variants[]` | `conditionals` (`kind`) |
 | 5 Skill checks | `checks[]` | `checks` |
 | (new) Standing rules | `features[]` — persistent mechanical properties of the area | `features` |
+| (new) DM technique | `technique[]` — how to *perform* the scene, not facts about it | `technique` |
+
+**Technique is not a prompt and not background.** *"Cast as much doubt as you
+can"* and *"don't track exactly where everyone is standing"* are advice about
+how you run the table — they tell you nothing about the world and ask nothing of
+the players. Mixing them into green was a large part of why the directive
+highlight felt inaccurate. Given its own block (purple), green narrows to things
+you actually say to the players.
 
 Scene text shares the `read_alouds` table with a `source` discriminator so both
 render through one component with different styling, and each ingest pass
@@ -137,6 +145,14 @@ CREATE TABLE features (
   name TEXT NOT NULL,             -- "Sanctuary of Bahamut"
   text TEXT NOT NULL
 );
+
+CREATE TABLE technique (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  section_id TEXT NOT NULL REFERENCES sections(id),
+  ordinal INTEGER NOT NULL,
+  name TEXT NOT NULL,             -- "Cast as much doubt as you can"
+  text TEXT NOT NULL
+);
 ```
 
 `checks.context` separates *what the character is doing* from *what it costs* —
@@ -172,9 +188,32 @@ Blocks render in play order — chronological to how a room actually runs:
 ├─ Depends on    branches (prior sessions)
 ├─ Checks        table: context, skills, DC, cost, success, fail
 ├─ Always on     features — standing rules for the area
+├─ How to run    technique — DM craft advice (purple)
 ├─ Background    lore
 └─ Creatures     chips → stat block popup
 ```
+
+### Colour
+
+With content split into blocks, structure carries most of the meaning and colour
+becomes a quiet accent rather than the primary signal. **Tint the block's label
+and left border, not the body text** — the loud inline highlighting existed
+because everything was one undifferentiated paragraph, and that's no longer true.
+
+| Block | Hue | Existing token |
+|---|---|---|
+| Read aloud (book) | blue | `--accent` |
+| Scene (authored) | blue, dashed border to mark non-canonical | `--accent` |
+| Ask / Do | green | `--directive` |
+| Conditionals | yellow | `--conditional-*` |
+| Checks | amber | `--lock` |
+| Technique | **purple** *(new — `--technique`)* | — |
+| Features | neutral + rule icon | `--border` |
+| Background | neutral | — |
+
+The three conditional kinds share the yellow hue and are separated by label and
+icon rather than three more colours — otherwise the page becomes a rainbow and
+colour stops meaning anything.
 
 **Prep mode vs. Run mode** — one persisted toggle:
 
@@ -201,6 +240,7 @@ tells you how heavy a room is before you open it.
 | `blocks/ConditionalsBlock.tsx` | triggers, branches, variants (one component, three modes) |
 | `blocks/ChecksBlock.tsx` | check table + reveal toggles |
 | `blocks/FeaturesBlock.tsx` | standing rules for the area |
+| `blocks/TechniqueBlock.tsx` | DM craft advice, purple |
 | `blocks/BackgroundBlock.tsx` | plain prose — no inline markup |
 | `PrepStrip.tsx` | counts + resolved variants |
 
@@ -218,8 +258,16 @@ Prompt changes:
 
 - **Prompts** are strictly player-facing — "ask the players…", "have a character
   make…", "encourage them to…". Explicitly **exclude** DM navigation ("continue
-  with X", "see appendix A") and DM-internal running advice ("rely on your sense
-  of what's fun").
+  with X", "see appendix A"), which is dropped, and DM craft advice, which now
+  goes to `technique`.
+- **Technique** is advice about how to *perform* the scene — pacing, what to
+  emphasise, what to keep ambiguous, what not to bother tracking. The test: it
+  tells you nothing about the world and asks nothing of the players. Source text
+  usually signals it with second-person address to the DM ("you don't need to…",
+  "rely on your sense of…", "cast as much doubt as you can").
+- **Features** are standing mechanical rules that apply while the party is in
+  the area, with no trigger and no roll to discover — A5's saving-throw bonus,
+  B1's tide depths.
 - **Conditionals** get the three-way definition with book examples:
   - `trigger` — fires from something the party does *in this scene* (movement,
     touching, attacking, noise)
@@ -317,12 +365,17 @@ background reads fine without them and the duplication is just noise. Dropping
 the inline markup also removes `dmText.tsx` and the classifier's span-balance
 retry logic entirely.
 
-**Both fixture sections have zero prompts.** Neither has anything the DM asks
-the players to do — B2's *"cast as much doubt as you can"* is DM technique, not
-a player prompt, and under the tightened definition it stays in background. This
-is direct evidence the current green highlight is over-firing. Worth expecting
-`prompts[]` to be empty for most location sections and concentrated in
-encounters and NPC introductions.
+**Both fixture sections have zero prompts — and that exposed an eighth block.**
+Neither section has anything the DM asks the players to do. B2's three pieces of
+running advice (*"cast as much doubt as you can"*, *"you don't need to track
+exactly where everyone is standing"*, *"the interesting part is identifying the
+danger"*) were initially parked in background, but they're not background either
+— they're DM craft. They became `technique[]`, rendered purple. Green now means
+only "something you say to the players," which is what makes it trustworthy.
+
+Expect `prompts[]` to be empty for most locations and concentrated in encounters
+and NPC introductions; expect `technique[]` to cluster in combat-bearing rooms
+and the front-matter DM guidance chapter.
 
 ## 8. Risks
 

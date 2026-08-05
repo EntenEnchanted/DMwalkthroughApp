@@ -22,6 +22,7 @@
     ],
     "background_text": "The temple is very simple, with the statue (represented by the star-in-a-circle symbol on the map) as its only furnishing. The statue depicts Bahamut, the Platinum Dragon, in mortal disguise, surrounded by seven canaries that represent gold dragons who accompany him on his travels.\n\nDepressions in the statue's pedestal at the four cardinal directions hold offerings of incense made to Bahamut. Runara spends about half her time here, tending and maintaining the temple, offering prayers and incense, or in quiet contemplation. Other residents of the cloister help her, most often Varnoth and the kobold Rix.\n\nThe feeling of serenity that pervades the temple is the result of protective magic. Runara is the only inhabitant of Dragon's Rest who knows that this is a lingering effect of the death of a dragon on this site — her father, Astalagan.\n\nAbout Bahamut. Known as the Platinum Dragon, Bahamut is the patron and progenitor of metallic dragons. Adventurers and dragons alike pray to Bahamut to uphold honor and justice, or when they need courage to face a great threat. He seldom interferes in the affairs of mortal creatures, though he makes exceptions to help thwart the machinations of Tiamat the Dragon Queen and the evil dragons that serve her.",
     "prompts": [],
+    "technique": [],
     "conditionals": [],
     "checks": [
       {
@@ -94,8 +95,25 @@
         "text": "The air is warm and wet enough to sit on the skin, thick with the sulfur reek and something earthier beneath it — wet loam and rot. Sound behaves strangely under fifty feet of stone: the burble of falling water arrives flattened and close, while footsteps vanish into the spongy mat of the cavern floor. Spores drift through the glow like slow dust, catching the light from the caps overhead. Everything here is soft — the ground gives underfoot, the stalks bend aside at a touch — and nothing in the cavern moves except the water and the two small figures stooped among the mushrooms."
       }
     ],
-    "background_text": "The waterfall is fed from a pool in the upper cave, which in turn is supplied by runoff trickling down from the surface. Both pools are 5 feet deep at most.\n\nThe two mushroom people are myconid sprouts named Molen and Kraz. They are spreading fertilizer from area B3, while two myconid adults named Hipsiz and Rugoso tend the mushrooms near the upper pool, out of sight from below. All four myconids are oblivious to the true threat in the cave — three violet fungi that grow among the harmless mushrooms here.\n\nRunning the Combat. Because the violet fungi move so slowly, it's easy for the characters to stay out of their reach and kill the fungus monsters with ranged attacks. The interesting part of this encounter is identifying the danger. You don't need to keep track of exactly where everyone is standing in the room. Instead, rely on your sense of what's fun and exciting. If a character scans the fungus farm looking for more violet fungi, cast as much doubt as you can: many of the fungi look sickly and purple but pose no danger.\n\nMyconids. The myconid sprouts avoid the characters and the violet fungi.",
+    "background_text": "The waterfall is fed from a pool in the upper cave, which in turn is supplied by runoff trickling down from the surface. Both pools are 5 feet deep at most.\n\nThe two mushroom people are myconid sprouts named Molen and Kraz. They are spreading fertilizer from area B3, while two myconid adults named Hipsiz and Rugoso tend the mushrooms near the upper pool, out of sight from below. All four myconids are oblivious to the true threat in the cave — three violet fungi that grow among the harmless mushrooms here.\n\nThe myconid sprouts avoid the characters and the violet fungi.",
     "prompts": [],
+    "technique": [
+      {
+        "ordinal": 0,
+        "name": "The tension is identification, not the fight",
+        "text": "The violet fungi move so slowly that characters can easily stay out of reach and kill them with ranged attacks. The interesting part of this encounter is working out which mushrooms are dangerous — play for that, not for the combat."
+      },
+      {
+        "ordinal": 1,
+        "name": "Don't track exact positions",
+        "text": "You don't need to keep track of exactly where everyone is standing in the room. Rely on your sense of what's fun and exciting."
+      },
+      {
+        "ordinal": 2,
+        "name": "Cast as much doubt as you can",
+        "text": "If a character scans the fungus farm looking for more violet fungi, cast as much doubt as you can — many of the fungi look sickly and purple but pose no danger."
+      }
+    ],
     "conditionals": [
       {
         "ordinal": 0,
