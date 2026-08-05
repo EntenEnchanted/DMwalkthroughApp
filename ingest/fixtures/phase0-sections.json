@@ -3,7 +3,11 @@
     "id": "1-a5-temple-of-bahamut",
     "chapter": "Chapter 1: Dragon's Rest",
     "heading": "A5: Temple of Bahamut",
-    "heading_path": ["Chapter 1: Dragon's Rest", "Welcome to Dragon's Rest", "Dragon's Rest Locations"],
+    "heading_path": [
+      "Chapter 1: Dragon's Rest",
+      "Welcome to Dragon's Rest",
+      "Dragon's Rest Locations"
+    ],
     "order": 32,
     "type": "location",
     "read_alouds": [
@@ -16,11 +20,11 @@
       {
         "ordinal": 1,
         "source": "authored",
-        "cue": "Optional atmosphere — layer in after the boxed text, or use if the party lingers",
+        "cue": "Optional atmosphere \u2014 layer in after the boxed text, or use if the party lingers",
         "text": "Wind comes off the water and moves through the pillars without ever quite becoming a sound; overhead, the roof beams answer it with a slow, settling creak. Salt hangs in the air, cut with the sweeter smoke of incense burning low in the four hollows of the pedestal. The stone underfoot has held the day's warmth, and far below, the sea works at the cliff in a rhythm felt through the soles of your boots more than heard. The carved canaries watch the horizon, patient as the rock they were cut from."
       }
     ],
-    "background_text": "The temple is very simple, with the statue (represented by the star-in-a-circle symbol on the map) as its only furnishing. The statue depicts Bahamut, the Platinum Dragon, in mortal disguise, surrounded by seven canaries that represent gold dragons who accompany him on his travels.\n\nDepressions in the statue's pedestal at the four cardinal directions hold offerings of incense made to Bahamut. Runara spends about half her time here, tending and maintaining the temple, offering prayers and incense, or in quiet contemplation. Other residents of the cloister help her, most often Varnoth and the kobold Rix.\n\nThe feeling of serenity that pervades the temple is the result of protective magic. Runara is the only inhabitant of Dragon's Rest who knows that this is a lingering effect of the death of a dragon on this site — her father, Astalagan.\n\nAbout Bahamut. Known as the Platinum Dragon, Bahamut is the patron and progenitor of metallic dragons. Adventurers and dragons alike pray to Bahamut to uphold honor and justice, or when they need courage to face a great threat. He seldom interferes in the affairs of mortal creatures, though he makes exceptions to help thwart the machinations of Tiamat the Dragon Queen and the evil dragons that serve her.",
+    "background_text": "The temple is very simple, with the statue (represented by the star-in-a-circle symbol on the map) as its only furnishing. The statue depicts Bahamut, the Platinum Dragon, in mortal disguise, surrounded by seven canaries that represent gold dragons who accompany him on his travels.\n\nDepressions in the statue's pedestal at the four cardinal directions hold offerings of incense made to Bahamut. Runara spends about half her time here, tending and maintaining the temple, offering prayers and incense, or in quiet contemplation. Other residents of the cloister help her, most often Varnoth and the kobold Rix.\n\nThe feeling of serenity that pervades the temple is the result of protective magic. Runara is the only inhabitant of Dragon's Rest who knows that this is a lingering effect of the death of a dragon on this site \u2014 her father, Astalagan.\n\nAbout Bahamut. Known as the Platinum Dragon, Bahamut is the patron and progenitor of metallic dragons. Adventurers and dragons alike pray to Bahamut to uphold honor and justice, or when they need courage to face a great threat. He seldom interferes in the affairs of mortal creatures, though he makes exceptions to help thwart the machinations of Tiamat the Dragon Queen and the evil dragons that serve her.",
     "prompts": [],
     "technique": [],
     "conditionals": [],
@@ -28,7 +32,9 @@
       {
         "ordinal": 0,
         "context": "Examining the statue",
-        "skills": ["Intelligence (Religion)"],
+        "skills": [
+          "Intelligence (Religion)"
+        ],
         "dc": 10,
         "passive": false,
         "kind": "info",
@@ -44,7 +50,7 @@
         "passive": false,
         "kind": "info",
         "cost": "",
-        "success_text": "The resident identifies Bahamut. No check required — this is the bypass for a failed Religion check.",
+        "success_text": "The resident identifies Bahamut. No check required \u2014 this is the bypass for a failed Religion check.",
         "fail_text": ""
       },
       {
@@ -66,13 +72,20 @@
         "text": "A non-evil creature who makes a saving throw within the temple can roll a d4 and add the number rolled to the saving throw."
       }
     ],
-    "references": ["creature-runara", "creature-varnoth"]
+    "references": [
+      "creature-runara",
+      "creature-varnoth"
+    ]
   },
   {
     "id": "2-b2-fungus-farm",
     "chapter": "Chapter 2: Seagrow Caves",
     "heading": "B2: Fungus Farm",
-    "heading_path": ["Chapter 2: Seagrow Caves", "Running This Chapter", "Seagrow Caves Locations"],
+    "heading_path": [
+      "Chapter 2: Seagrow Caves",
+      "Running This Chapter",
+      "Seagrow Caves Locations"
+    ],
     "order": 64,
     "type": "location",
     "read_alouds": [
@@ -91,17 +104,17 @@
       {
         "ordinal": 2,
         "source": "authored",
-        "cue": "Optional atmosphere — layer in after the boxed text, or use while the party explores before combat",
-        "text": "The air is warm and wet enough to sit on the skin, thick with the sulfur reek and something earthier beneath it — wet loam and rot. Sound behaves strangely under fifty feet of stone: the burble of falling water arrives flattened and close, while footsteps vanish into the spongy mat of the cavern floor. Spores drift through the glow like slow dust, catching the light from the caps overhead. Everything here is soft — the ground gives underfoot, the stalks bend aside at a touch — and nothing in the cavern moves except the water and the two small figures stooped among the mushrooms."
+        "cue": "Optional atmosphere \u2014 layer in after the boxed text, or use while the party explores before combat",
+        "text": "The air is warm and wet enough to sit on the skin, thick with the sulfur reek and something earthier beneath it \u2014 wet loam and rot. Sound behaves strangely under fifty feet of stone: the burble of falling water arrives flattened and close, while footsteps vanish into the spongy mat of the cavern floor. Spores drift through the glow like slow dust, catching the light from the caps overhead. Everything here is soft \u2014 the ground gives underfoot, the stalks bend aside at a touch \u2014 and nothing in the cavern moves except the water and the two small figures stooped among the mushrooms."
       }
     ],
-    "background_text": "The waterfall is fed from a pool in the upper cave, which in turn is supplied by runoff trickling down from the surface. Both pools are 5 feet deep at most.\n\nThe two mushroom people are myconid sprouts named Molen and Kraz. They are spreading fertilizer from area B3, while two myconid adults named Hipsiz and Rugoso tend the mushrooms near the upper pool, out of sight from below. All four myconids are oblivious to the true threat in the cave — three violet fungi that grow among the harmless mushrooms here.\n\nThe myconid sprouts avoid the characters and the violet fungi.",
+    "background_text": "The waterfall is fed from a pool in the upper cave, which in turn is supplied by runoff trickling down from the surface. Both pools are 5 feet deep at most.\n\nThe two mushroom people are myconid sprouts named Molen and Kraz. They are spreading fertilizer from area B3, while two myconid adults named Hipsiz and Rugoso tend the mushrooms near the upper pool, out of sight from below. All four myconids are oblivious to the true threat in the cave \u2014 three violet fungi that grow among the harmless mushrooms here.\n\nThe myconid sprouts avoid the characters and the violet fungi.",
     "prompts": [],
     "technique": [
       {
         "ordinal": 0,
         "name": "The tension is identification, not the fight",
-        "text": "The violet fungi move so slowly that characters can easily stay out of reach and kill them with ranged attacks. The interesting part of this encounter is working out which mushrooms are dangerous — play for that, not for the combat."
+        "text": "The violet fungi move so slowly that characters can easily stay out of reach and kill them with ranged attacks. The interesting part of this encounter is working out which mushrooms are dangerous \u2014 play for that, not for the combat."
       },
       {
         "ordinal": 1,
@@ -111,7 +124,7 @@
       {
         "ordinal": 2,
         "name": "Cast as much doubt as you can",
-        "text": "If a character scans the fungus farm looking for more violet fungi, cast as much doubt as you can — many of the fungi look sickly and purple but pose no danger."
+        "text": "If a character scans the fungus farm looking for more violet fungi, cast as much doubt as you can \u2014 many of the fungi look sickly and purple but pose no danger."
       }
     ],
     "conditionals": [
@@ -136,7 +149,7 @@
       {
         "ordinal": 3,
         "kind": "trigger",
-        "condition": "The myconid adults become aware of danger — through combat noise or the sprouts' Distress Spores",
+        "condition": "The myconid adults become aware of danger \u2014 through combat noise or the sprouts' Distress Spores",
         "effect": "They move as quickly as they can to protect the sprouts."
       },
       {
@@ -156,12 +169,15 @@
       {
         "ordinal": 0,
         "context": "Searching the chamber for useful fungi",
-        "skills": ["Intelligence (Nature)", "Wisdom (Survival)"],
+        "skills": [
+          "Intelligence (Nature)",
+          "Wisdom (Survival)"
+        ],
         "dc": 12,
         "passive": false,
         "kind": "discovery",
         "cost": "15 minutes",
-        "success_text": "Finds 1d6 heart cap mushrooms — reddish, and bearing an unsettling resemblance to human hearts. Tarak can make each one into a potion of healing.",
+        "success_text": "Finds 1d6 heart cap mushrooms \u2014 reddish, and bearing an unsettling resemblance to human hearts. Tarak can make each one into a potion of healing.",
         "fail_text": ""
       },
       {
@@ -177,6 +193,11 @@
       }
     ],
     "features": [],
-    "references": ["creature-myconid-sprout", "creature-myconid-adult", "creature-violet-fungus"]
+    "references": [
+      "creature-myconid-sprout",
+      "creature-myconid-adult",
+      "creature-violet-fungus",
+      "creature-tarak"
+    ]
   }
 ]
