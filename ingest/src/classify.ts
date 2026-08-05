@@ -58,7 +58,10 @@ e.g. "On first entering the cavern", "When the trap is triggered". Preserve the 
 
 - background_text: information about the world that the DM needs but does not perform — who lives \
 here, what happened before, what things are, why they matter. This is the default for prose that is \
-not one of the more specific categories below. Plain paragraphs, no markup.
+not one of the more specific categories below. Plain paragraphs, no markup. PRESERVE LISTS. If the \
+section enumerates things — monsters, rumours, NPCs, treasure, table entries — reproduce every entry. \
+Never replace a list with a sentence describing that a list exists; the DM needs the entries \
+themselves, not a summary of them.
 
 - prompts: things the DM should ask the players, or get the players to do. STRICTLY player-facing: \
 "ask the players how they want to approach", "have each character describe what they do first". \

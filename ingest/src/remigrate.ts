@@ -107,6 +107,35 @@ async function main() {
         `${result.prompts.length} pr, ${result.technique.length} tq, ${result.features.length} ft`
     );
 
+    // No category is a valid outcome for a heading-only stub, but this section
+    // had real text — so if the classifier returned nothing at all, keep the
+    // original prose as background rather than silently dropping it.
+    const producedNothing =
+      !result.read_alouds.length &&
+      !result.reveals.length &&
+      !result.conditionals.length &&
+      !result.prompts.length &&
+      !result.technique.length &&
+      !result.features.length &&
+      !result.background_text.trim();
+    // A section that comes back far shorter than it went in has been summarised
+    // rather than split — usually an enumerated list collapsed to a sentence.
+    // Keep the extracted blocks, but restore the full prose as background.
+    const words = (s: string) => s.split(/\s+/).filter(Boolean).length;
+    const sourceWords = words(stripLegacyMarkup(section.dm_only_text)) + words(section.read_aloud_text);
+    const producedWords =
+      words(result.background_text) +
+      result.read_alouds.reduce((n, x) => n + words(x.text), 0) +
+      result.conditionals.reduce((n, x) => n + words(`${x.condition} ${x.effect}`), 0) +
+      result.technique.reduce((n, x) => n + words(x.text), 0) +
+      result.features.reduce((n, x) => n + words(x.text), 0) +
+      result.reveals.reduce((n, x) => n + words(x.text), 0);
+    const summarised = sourceWords > 60 && producedWords < sourceWords * 0.6;
+    if (summarised) console.log(`      (restored full prose — output was ${producedWords}/${sourceWords} words)`);
+
+    const background =
+      producedNothing || summarised ? stripLegacyMarkup(section.dm_only_text) : result.background_text;
+
     output.push({
       id: section.id,
       module_id: moduleId,
@@ -122,7 +151,7 @@ async function main() {
       reveals: result.reveals as Reveal[],
       references: [] as string[],
       read_alouds: result.read_alouds,
-      background_text: result.background_text,
+      background_text: background,
       prompts: result.prompts,
       technique: result.technique,
       conditionals: result.conditionals,
