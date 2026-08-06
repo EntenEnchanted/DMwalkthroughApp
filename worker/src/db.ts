@@ -22,6 +22,13 @@ import type {
  * A section ingested before the block model has no blocks; its existing text is
  * passed through untouched.
  */
+export function derivedTexts(section: IngestSection): Pick<IngestSection, "read_aloud_text" | "dm_only_text"> {
+  return {
+    read_aloud_text: derivedReadAloudText(section),
+    dm_only_text: derivedDmOnlyText(section),
+  };
+}
+
 function derivedReadAloudText(section: IngestSection): string {
   if (!section.read_alouds?.length) return section.read_aloud_text;
   return section.read_alouds.map((r) => r.text).join("\n\n");
