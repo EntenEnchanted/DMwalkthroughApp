@@ -135,6 +135,7 @@ function proxyConfig(): { url: string; token: string } | null {
 interface MessagesRequest {
   model: string;
   max_tokens: number;
+  temperature: number;
   system: string;
   messages: { role: "user"; content: string }[];
   tools: unknown[];
@@ -170,6 +171,27 @@ function looksCorrupted(text: string): boolean {
  */
 function arr<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value as T[]) : [];
+}
+
+/**
+ * A section with real text that came back with every category empty. Observed on
+ * a 3,400-character room: not corrupt, not an error, just nothing extracted. Worth
+ * one more attempt, since the alternative is silently losing the whole section —
+ * remigrate.ts already guarded its own callsite this way, so the protection only
+ * existed for one of the two callers.
+ */
+function looksDegenerate(section: ParsedSection, result: ClassifiedBlocks): boolean {
+  // Heading-only stubs legitimately produce nothing at all.
+  if (section.rawText.split(/\s+/).filter(Boolean).length < 60) return false;
+  return (
+    !arr(result.read_alouds).length &&
+    !arr(result.checks).length &&
+    !arr(result.conditionals).length &&
+    !arr(result.prompts).length &&
+    !arr(result.technique).length &&
+    !arr(result.features).length &&
+    !(result.background_text ?? "").trim()
+  );
 }
 
 /** Last-resort safety net: hard-truncate at the first marker rather than ever saving mangled output. */
@@ -267,7 +289,8 @@ const TOOL_SCHEMA = {
 async function classifyOnce(
   section: ParsedSection,
   creatureNames: string[],
-  moduleId: string
+  moduleId: string,
+  temperature: number
 ): Promise<ClassifiedBlocks> {
   const system = SYSTEM_PROMPT.replace("{{CREATURE_NAMES}}", creatureNames.join(", ")).replace(
     "{{MODULE_CONVENTIONS}}",
@@ -278,6 +301,7 @@ async function classifyOnce(
   const response = await sendMessages({
     model: MODEL,
     max_tokens: 8192,
+    temperature,
     system,
     messages: [
       {
@@ -302,20 +326,33 @@ async function classifyOnce(
   return toolUse.input as ClassifiedBlocks;
 }
 
+/**
+ * How a section splits is a fact about its text, so the first pass is greedy:
+ * at the API default of 1.0 the same section disagreed with itself run to run on
+ * how many triggers, checks and technique entries it contained.
+ *
+ * Retries must sample differently or they are pointless — a greedy retry returns
+ * the identical response, turning the corruption and degenerate guards into a
+ * loop that burns attempts and changes nothing.
+ */
+const FIRST_PASS_TEMPERATURE = 0;
+const RETRY_TEMPERATURE = 0.6;
+
 export async function classifySection(
   section: ParsedSection,
   creatureNames: string[],
   moduleId = "dosi"
 ): Promise<ClassifiedSection> {
-  let result = await classifyOnce(section, creatureNames, moduleId);
+  let result = await classifyOnce(section, creatureNames, moduleId, FIRST_PASS_TEMPERATURE);
   let attempts = 1;
 
-  while (
-    (looksCorrupted(result.background_text ?? "") ||
-      arr<{ text?: string }>(result.read_alouds).some((r) => looksCorrupted(r.text ?? ""))) &&
-    attempts < MAX_ATTEMPTS
-  ) {
-    result = await classifyOnce(section, creatureNames, moduleId);
+  const needsRetry = (r: ClassifiedBlocks) =>
+    looksCorrupted(r.background_text ?? "") ||
+    arr<{ text?: string }>(r.read_alouds).some((x) => looksCorrupted(x.text ?? "")) ||
+    looksDegenerate(section, r);
+
+  while (needsRetry(result) && attempts < MAX_ATTEMPTS) {
+    result = await classifyOnce(section, creatureNames, moduleId, RETRY_TEMPERATURE);
     attempts++;
   }
 

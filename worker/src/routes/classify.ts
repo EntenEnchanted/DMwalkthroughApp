@@ -20,6 +20,7 @@ const MAX_TOKENS_CEILING = 8192;
 interface ClassifyRequest {
   model?: string;
   max_tokens?: number;
+  temperature?: number;
   system?: string;
   messages?: unknown;
   tools?: unknown;
@@ -51,6 +52,10 @@ export async function handleClassify(request: Request, env: Env): Promise<Respon
     body: JSON.stringify({
       model: body.model,
       max_tokens: Math.min(body.max_tokens ?? 4096, MAX_TOKENS_CEILING),
+      // Forwarded, clamped to the API's valid range. Dropping it silently sent
+      // every classification at the default 1.0 no matter what the caller asked for.
+      temperature:
+        typeof body.temperature === "number" ? Math.min(Math.max(body.temperature, 0), 1) : undefined,
       system: body.system,
       messages: body.messages,
       tools: body.tools,

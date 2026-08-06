@@ -13,6 +13,7 @@
     "scene": "tsx src/scene.ts",
     "remigrate": "tsx src/remigrate.ts",
     "dump": "tsx src/dump.ts",
+    "bench": "tsx src/bench.ts",
     "load": "tsx src/load.ts"
   },
   "dependencies": {
