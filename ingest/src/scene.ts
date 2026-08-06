@@ -75,6 +75,8 @@ function proxyConfig(): { url: string; token: string } | null {
   return url && token ? { url, token } : null;
 }
 
+const MAX_ATTEMPTS = 4;
+
 async function generate(section: Section, bookText: string): Promise<string> {
   const payload = {
     model: MODEL,
@@ -89,20 +91,30 @@ async function generate(section: Section, bookText: string): Promise<string> {
   };
 
   const proxy = proxyConfig();
-  const res = await fetch(proxy ? proxy.url : "https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: proxy
-      ? { "content-type": "application/json", "X-Admin-Token": proxy.token }
-      : {
-          "content-type": "application/json",
-          "x-api-key": process.env.ANTHROPIC_API_KEY ?? "",
-          "anthropic-version": "2023-06-01",
-        },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) throw new Error(`${res.status}: ${(await res.text()).slice(0, 200)}`);
-  const json = (await res.json()) as { content: { type: string; text?: string }[] };
-  return (json.content.find((c) => c.type === "text")?.text ?? "").trim();
+
+  // Overload and rate limiting are routine across a run this long, and losing the
+  // whole pass to one of them is not.
+  for (let attempt = 1; ; attempt++) {
+    const res = await fetch(proxy ? proxy.url : "https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: proxy
+        ? { "content-type": "application/json", "X-Admin-Token": proxy.token }
+        : {
+            "content-type": "application/json",
+            "x-api-key": process.env.ANTHROPIC_API_KEY ?? "",
+            "anthropic-version": "2023-06-01",
+          },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+      const json = (await res.json()) as { content: { type: string; text?: string }[] };
+      return (json.content.find((c) => c.type === "text")?.text ?? "").trim();
+    }
+    const body = (await res.text()).slice(0, 200);
+    const retryable = res.status === 429 || res.status >= 500;
+    if (!retryable || attempt === MAX_ATTEMPTS) throw new Error(`${res.status}: ${body}`);
+    await new Promise((r) => setTimeout(r, 2000 * 2 ** (attempt - 1)));
+  }
 }
 
 const STOPWORDS = new Set([
@@ -121,18 +133,29 @@ function leakedNames(scene: string, bookText: string): string[] {
 }
 
 async function main() {
-  const path = process.argv[2];
+  const args = process.argv.slice(2);
+  const path = args.find((a) => !a.startsWith("--"));
+  const resume = args.includes("--resume");
   if (!path) {
-    console.error("usage: npm run scene -- <classifier-output.json>");
+    console.error("usage: npm run scene -- <classifier-output.json> [--resume]");
     process.exit(1);
   }
 
   const sections = JSON.parse(readFileSync(path, "utf-8")) as Section[];
   // Only rooms the book actually describes. Chapter intros and overviews get
   // typed `location` too, and inventing atmosphere for those makes no sense.
-  const targets = sections.filter(
+  let targets = sections.filter(
     (s) => s.type === "location" && (s.read_alouds ?? []).some((r) => r.source === "book")
   );
+
+  // Regenerating is the only way to correct prose you don't like, so a rerun
+  // rewrites every room by default. --resume is for picking a failed pass back
+  // up, and skips rooms that already carry authored text.
+  if (resume) {
+    const total = targets.length;
+    targets = targets.filter((s) => !(s.read_alouds ?? []).some((r) => r.source === "authored"));
+    console.log(`Resuming: ${total - targets.length} already done, ${targets.length} to go.`);
+  }
 
   console.log(`Generating scene text for ${targets.length} rooms...`);
   let flagged = 0;
@@ -166,6 +189,10 @@ async function main() {
         text: scene,
       },
     ].map((r, i): ReadAloud => ({ ...r, ordinal: i }));
+
+    // Checkpoint per room. A pass this long that only wrote at the end threw
+    // away every passage before the failure whenever one call went wrong.
+    writeFileSync(path, JSON.stringify(sections, null, 2));
   }
 
   writeFileSync(path, JSON.stringify(sections, null, 2));
