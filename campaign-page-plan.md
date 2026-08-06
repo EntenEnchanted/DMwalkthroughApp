@@ -343,9 +343,9 @@ lightweight outline index plus lazy per-section fetch.
 
 ## 6. Status
 
-All six phases are built and deployed. Production runs this branch's code,
-deployed directly with `wrangler` — see the handover note at the end for how
-that relates to `main`.
+All six phases are built and deployed, for both modules. Production runs this
+branch's code, deployed directly with `wrangler` — see the handover note at the
+end for how that relates to `main`.
 
 | Phase | State |
 |---|---|
@@ -353,17 +353,20 @@ that relates to `main`.
 | 1 — schema + worker | done — migration `0011`, applied to production D1 |
 | 2 — layout | done — two-pane, blocks, prep/run mode, density chips |
 | 3 — classify pass | done — DoSI's 130 sections classified and loaded |
-| 4 — scene pass | done for DoSI (29 rooms); **not run for LMoP** |
+| 4 — scene pass | done — DoSI 29 rooms, LMoP 75 rooms |
 | 5 — polish | done — `SectionBody`, party level (migration `0012`) |
-| 6 — LMoP migration | classification done (287 sections); scene pass outstanding |
+| 6 — LMoP migration | done — classification, scene pass, creatures |
 
 ### What is in production
 
 ```
-dosi   130 sections   82 read-alouds (53 book + 29 authored)   63 checks
-                      127 conditionals   44 technique   20 features
-lmop   287 sections   88 read-alouds (all book, no scene yet)  114 checks
-                      282 conditionals   90 technique   54 features
+dosi   156 total = 130 narrative + 20 creatures + 6 items
+       82 read-alouds (53 book + 29 authored)   63 checks
+       127 conditionals   44 technique   20 features
+lmop   333 total = 287 narrative + 33 creatures + 13 items
+       163 read-alouds (88 book + 75 authored)  114 checks
+       282 conditionals   90 technique   54 features
+       237 creature references across 142 sections
 ```
 
 DoSI produced 18 party-level variants and LMoP 2, which is the per-module
@@ -372,38 +375,45 @@ sidebar and its hint says so.
 
 ### Outstanding
 
-1. **Scene pass for LMoP.** 75 of its locations have a book read-aloud and would
-   take scene text. `npm run scene -- <file>` operates on a classified sections
-   file, so this needs the module re-dumped from D1 first (see below) or the
-   `remigrate.ts` output regenerated — `ingest/output/` is not committed.
-2. **LMoP has no creature data.** 0 creature sections, 0 references, so its stat
-   block chips have never worked and the "Creatures here" block never renders.
-   Closing this needs an LMoP creature seed JSON equivalent to
-   `dosi-creatures-seed.json`, which is transcription work.
-3. **Technique is under-detected inside rooms.** B2 yields one entry where the
-   hand-authored fixture has three; the text is present but merged coarsely.
-   Prompt tuning — measure any change with `npm run verify`.
+1. **LMoP's unique NPCs use the closest standard block.** Glasstaff, Nezznar the
+   Black Spider and Hamun Kost deviate from the SRD blocks they were seeded with,
+   and Sildar's `Veteran` entry never auto-links because the text names him
+   rather than his stat block. This wants a review pass against the book.
+2. **`bench.ts` measures against two sections.** It is a yardstick for
+   catching drift, not a corpus. The remaining fixture disagreements (§10) are
+   boundary judgements rather than errors, and tuning them away on a two-section
+   sample would be over-fitting.
+3. **Legacy `dmText.tsx` can now go.** It renders inline `<cond>` / `[[directive]]`
+   markup for sections with no blocks. Both live modules are fully migrated, so
+   nothing reaches that path any more — but the fallback in §8 should stay until
+   someone confirms no future module needs it.
 
 ### Running the pipeline again
 
 ```bash
-# Dump a module's stored text (paged; D1 caps result size)
-npx wrangler d1 execute dosi-db --remote --json --config worker/wrangler.toml \
-  --command "SELECT id, chapter, heading, heading_path, \"order\", type,
-             dm_only_text, read_aloud_text FROM sections
-             WHERE module_id='lmop' AND type NOT IN ('creature','item')
-             ORDER BY \"order\" LIMIT 60 OFFSET 0"
-
-npm run remigrate -- <dump.json> lmop     # blocks from stored text, checkpointed
-npm run scene     -- <file.json>          # authored atmosphere for locations
-npm run verify    -- <file.json>          # score against the fixture
-npm run load      -- <file.json>          # into D1 + Vectorize, batched
+npm run dump   -- lmop [--scene-targets]  # rebuild a loadable file from D1
+npm run scene  -- <file.json> [--resume]  # authored atmosphere for locations
+npm run bench                             # classify just the fixture sections
+npm run verify -- <file.json>             # score against the fixture
+npm run creatures -- lmop ../lmop-creatures-seed.json <dump.json>
+npm run load   -- <file.json>             # into D1 + Vectorize, batched
+npm run remigrate -- <dump.json> lmop     # re-classify from stored text
 ```
 
-Ingestion needs Anthropic access, which the session environment may not have.
-Either set `ANTHROPIC_API_KEY`, or re-add the temporary worker-side
-`/admin/classify` proxy (in git history) which uses the Worker's own secret —
-add it, run the pass, remove it, rotate `ADMIN_TOKEN`.
+`dump` is the entry point for everything after the first ingestion. `ingest/output/`
+is not committed and LMoP's source markdown was never in the repo, so once a pass
+is loaded the database holds the only copy of the classification. It reads the
+block tables directly — no API, no reclassification — and because loading
+**replaces every block table for a section**, it verifies the reconstruction
+round-trips against the stored derived text before writing a file at all. A dump
+that would lose content fails the run instead.
+
+`dump`, `creatures` and `load` need no Anthropic access at all — `dump` uses
+`CLOUDFLARE_API_TOKEN` via wrangler, the other two only `ADMIN_TOKEN`. Only
+`scene`, `bench` and `remigrate` call the API. For those, either set
+`ANTHROPIC_API_KEY`, or re-add the temporary worker-side `/admin/classify` proxy
+(in git history) which uses the Worker's own secret — add it, run the pass,
+remove it, rotate `ADMIN_TOKEN`.
 
 `frontend/preview.html` renders the real Campaign components against the fixture
 with no API, deploy or ingest run — `npm run dev`, then `/preview.html`.
@@ -457,9 +467,14 @@ and the front-matter DM guidance chapter.
 
 ## 8. Multiple modules
 
-Two modules are live: `dosi` (156 sections) and `lmop` (300 — 287 narrative plus
-13 magic items, 25 reveals). Any future adventure is a third. This section is
-about what the block model means for all of them.
+Two modules are live: `dosi` (156 sections) and `lmop` (333). Any future
+adventure is a third. This section is about what the block model means for all
+of them.
+
+> The rest of §8 was written while LMoP was still unmigrated and is kept in the
+> past tense it was written in — it explains *why* the migration took the shape
+> it did. Both modules now carry blocks throughout; the legacy path below is
+> live code but nothing currently reaches it.
 
 ### The schema is module-agnostic, permanently
 
@@ -529,7 +544,54 @@ The prep strip resolving level variants needs the party's level. DoSI spans 1–
 LMoP spans 1–5, so this belongs on the **campaign** record, not as a global
 app setting.
 
-## 9. Risks
+## 9. Two defects the later passes uncovered
+
+Both were silent, both were in the load path, and neither was visible from the
+app — worth recording because the shape recurs.
+
+**Every narrative section was embedded on its heading alone.** Block-model
+sections deliberately send `read_aloud_text` and `dm_only_text` empty so the
+worker owns how they are composed from blocks (§5). But `handleLoadSections`
+computed `embeddingText()` from the *raw request payload* rather than from what
+`upsertSection` had just derived and stored — so it saw two empty strings, and
+every narrative section in both modules went into Vectorize as its heading and
+nothing else. Search and chat had been retrieving on titles. Creature and item
+sections were unaffected, since those branches send real text. Fixed by embedding
+the derived text; the vectors themselves only recovered when both modules were
+reloaded, because a fix here is inert until a section is loaded again.
+
+**The classifier disagreed with itself.** `classify.ts` never set a temperature,
+so extraction ran at the API default of 1.0. Five runs over the same two fixture
+sections scored anywhere from 12/24 to 23/24, and one returned nothing at all for
+a 3,400-character room. The handover's "technique is under-detected" was one
+sample from that spread rather than a systematic bias, and three prompt edits
+aimed at it changed the output by not one field once temperature was pinned. The
+first pass is now greedy and the result is stable; retries sample at 0.6, because
+a greedy retry returns the identical response and would have turned the existing
+corruption guard into a loop that burns attempts and changes nothing.
+
+The general lesson for this pipeline: **measure before tuning.** A single
+observed run is not a defect, and a prompt is not the first thing to suspect.
+
+## 10. Fixture disagreements that are not bugs
+
+At temperature 0 the classifier stably scores 20/24 against the Phase 0 fixture.
+The four disagreements are boundary judgements, deliberately left alone:
+
+- **B2 technique 4 vs 3, triggers 2 vs 4.** Two of B2's triggers sit inside its
+  *Running the Combat* paragraph — "when a character moves away from an active
+  violet fungus, have another stir" reads as much like advice on keeping a fight
+  moving as like a rule to watch for. The classifier calls them technique; the
+  fixture calls them triggers. Its 4-way split of the advice is defensible on its
+  own terms, and arguably finer than the fixture's 3.
+- **A5 checks 2 vs 3.** It misses "asking any resident of Dragon's Rest", the
+  no-roll social route.
+
+These four are the entire gap, and closing them means tuning the prompt against
+two hand-authored sections — which is how you get a classifier that scores well
+on the fixture and worse on the other 415 sections.
+
+## 11. Risks
 
 - **Re-ingest overwrites everything.** Phase 3 replaces all classified content.
   Fixture-first exists to settle the target shape before that happens.
