@@ -1,1 +1,1467 @@
-[]
+[
+  {
+    "name": "Goblin",
+    "source": "SRD 5.1",
+    "size": "Small",
+    "type": "Humanoid (Goblinoid)",
+    "alignment": "Neutral Evil",
+    "ac": 15,
+    "init": 2,
+    "hp_avg": 7,
+    "hp_formula": "2d6",
+    "speed": { "walk": 30 },
+    "cr": "1/4",
+    "xp": 50,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 8, "mod": -1, "save": -1 },
+      "dex": { "score": 14, "mod": 2, "save": 2 },
+      "con": { "score": 10, "mod": 0, "save": 0 },
+      "int": { "score": 10, "mod": 0, "save": 0 },
+      "wis": { "score": 8, "mod": -1, "save": -1 },
+      "cha": { "score": 8, "mod": -1, "save": -1 }
+    },
+    "skills": { "Stealth": 6 },
+    "senses": "Darkvision 60 ft., Passive Perception 9",
+    "languages": "Common, Goblin",
+    "traits": [
+      {
+        "name": "Nimble Escape",
+        "text": "The goblin can take the Disengage or Hide action as a bonus action on each of its turns."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Scimitar",
+        "text": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 5 (1d6 + 2) slashing damage."
+      },
+      {
+        "name": "Shortbow",
+        "text": "Ranged Weapon Attack: +4 to hit, range 80/320 ft., one target. Hit: 5 (1d6 + 2) piercing damage."
+      }
+    ]
+  },
+  {
+    "name": "Bugbear",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Humanoid (Goblinoid)",
+    "alignment": "Chaotic Evil",
+    "ac": 16,
+    "init": 2,
+    "hp_avg": 27,
+    "hp_formula": "5d8 + 5",
+    "speed": { "walk": 30 },
+    "cr": "1",
+    "xp": 200,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 15, "mod": 2, "save": 2 },
+      "dex": { "score": 14, "mod": 2, "save": 2 },
+      "con": { "score": 13, "mod": 1, "save": 1 },
+      "int": { "score": 8, "mod": -1, "save": -1 },
+      "wis": { "score": 11, "mod": 0, "save": 0 },
+      "cha": { "score": 9, "mod": -1, "save": -1 }
+    },
+    "skills": { "Stealth": 6, "Survival": 2 },
+    "senses": "Darkvision 60 ft., Passive Perception 10",
+    "languages": "Common, Goblin",
+    "traits": [
+      {
+        "name": "Brute",
+        "text": "A melee weapon deals one extra die of its damage when the bugbear hits with it (included in the attack)."
+      },
+      {
+        "name": "Surprise Attack",
+        "text": "If the bugbear surprises a creature and hits it with an attack during the first round of combat, the target takes an extra 7 (2d6) damage from the attack."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Morningstar",
+        "text": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 11 (2d8 + 2) piercing damage."
+      },
+      {
+        "name": "Javelin",
+        "text": "Melee or Ranged Weapon Attack: +4 to hit, reach 5 ft. or range 30/120 ft., one target. Hit: 9 (2d6 + 2) piercing damage in melee or 5 (1d6 + 2) piercing damage at range."
+      }
+    ]
+  },
+  {
+    "name": "Hobgoblin",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Humanoid (Goblinoid)",
+    "alignment": "Lawful Evil",
+    "ac": 18,
+    "init": 1,
+    "hp_avg": 11,
+    "hp_formula": "2d8 + 2",
+    "speed": { "walk": 30 },
+    "cr": "1/2",
+    "xp": 100,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 13, "mod": 1, "save": 1 },
+      "dex": { "score": 12, "mod": 1, "save": 1 },
+      "con": { "score": 12, "mod": 1, "save": 1 },
+      "int": { "score": 10, "mod": 0, "save": 0 },
+      "wis": { "score": 10, "mod": 0, "save": 0 },
+      "cha": { "score": 9, "mod": -1, "save": -1 }
+    },
+    "skills": {},
+    "senses": "Darkvision 60 ft., Passive Perception 10",
+    "languages": "Common, Goblin",
+    "traits": [
+      {
+        "name": "Martial Advantage",
+        "text": "Once per turn, the hobgoblin can deal an extra 7 (2d6) damage to a creature it hits with a weapon attack if that creature is within 5 feet of an ally of the hobgoblin that isn't incapacitated."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Longsword",
+        "text": "Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 5 (1d8 + 1) slashing damage, or 6 (1d10 + 1) slashing damage if used with two hands."
+      },
+      {
+        "name": "Longbow",
+        "text": "Ranged Weapon Attack: +3 to hit, range 150/600 ft., one target. Hit: 5 (1d8 + 1) piercing damage."
+      }
+    ]
+  },
+  {
+    "name": "Wolf",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Beast",
+    "alignment": "Unaligned",
+    "ac": 13,
+    "init": 2,
+    "hp_avg": 11,
+    "hp_formula": "2d8 + 2",
+    "speed": { "walk": 40 },
+    "cr": "1/4",
+    "xp": 50,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 12, "mod": 1, "save": 1 },
+      "dex": { "score": 15, "mod": 2, "save": 2 },
+      "con": { "score": 12, "mod": 1, "save": 1 },
+      "int": { "score": 3, "mod": -4, "save": -4 },
+      "wis": { "score": 12, "mod": 1, "save": 1 },
+      "cha": { "score": 6, "mod": -2, "save": -2 }
+    },
+    "skills": { "Perception": 3, "Stealth": 4 },
+    "senses": "Passive Perception 13",
+    "languages": "—",
+    "traits": [
+      {
+        "name": "Keen Hearing and Smell",
+        "text": "The wolf has advantage on Wisdom (Perception) checks that rely on hearing or smell."
+      },
+      {
+        "name": "Pack Tactics",
+        "text": "The wolf has advantage on an attack roll against a creature if at least one of the wolf's allies is within 5 feet of the creature and the ally isn't incapacitated."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Bite",
+        "text": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 7 (2d4 + 2) piercing damage. If the target is a creature, it must succeed on a DC 11 Strength saving throw or be knocked prone."
+      }
+    ]
+  },
+  {
+    "name": "Giant Spider",
+    "source": "SRD 5.1",
+    "size": "Large",
+    "type": "Beast",
+    "alignment": "Unaligned",
+    "ac": 14,
+    "init": 3,
+    "hp_avg": 26,
+    "hp_formula": "4d10 + 4",
+    "speed": { "walk": 30, "climb": 30 },
+    "cr": "1",
+    "xp": 200,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 14, "mod": 2, "save": 2 },
+      "dex": { "score": 16, "mod": 3, "save": 3 },
+      "con": { "score": 12, "mod": 1, "save": 1 },
+      "int": { "score": 2, "mod": -4, "save": -4 },
+      "wis": { "score": 11, "mod": 0, "save": 0 },
+      "cha": { "score": 4, "mod": -3, "save": -3 }
+    },
+    "skills": { "Stealth": 7 },
+    "senses": "Blindsight 10 ft., Darkvision 60 ft., Passive Perception 10",
+    "languages": "—",
+    "traits": [
+      {
+        "name": "Spider Climb",
+        "text": "The spider can climb difficult surfaces, including upside down on ceilings, without needing to make an ability check."
+      },
+      {
+        "name": "Web Sense",
+        "text": "While in contact with a web, the spider knows the exact location of any other creature in contact with the same web."
+      },
+      {
+        "name": "Web Walker",
+        "text": "The spider ignores movement restrictions caused by webbing."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Bite",
+        "text": "Melee Weapon Attack: +5 to hit, reach 5 ft., one creature. Hit: 7 (1d8 + 3) piercing damage, and the target must make a DC 11 Constitution saving throw, taking 9 (2d8) poison damage on a failed save, or half as much damage on a successful one. If the poison damage reduces the target to 0 hit points, the target is stable but poisoned for 1 hour, even after regaining hit points, and is paralyzed while poisoned in this way."
+      },
+      {
+        "name": "Web (Recharge 5-6)",
+        "text": "Ranged Weapon Attack: +5 to hit, range 30/60 ft., one creature. Hit: The target is restrained by webbing. As an action, the restrained target can make a DC 12 Strength check, bursting the webbing on a success. The webbing can also be attacked and destroyed (AC 10; hp 5; vulnerability to fire damage; immunity to bludgeoning, poison, and psychic damage)."
+      }
+    ]
+  },
+  {
+    "name": "Ochre Jelly",
+    "source": "SRD 5.1",
+    "size": "Large",
+    "type": "Ooze",
+    "alignment": "Unaligned",
+    "ac": 8,
+    "init": -2,
+    "hp_avg": 45,
+    "hp_formula": "6d10 + 12",
+    "speed": { "walk": 10, "climb": 10 },
+    "cr": "2",
+    "xp": 450,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 15, "mod": 2, "save": 2 },
+      "dex": { "score": 6, "mod": -2, "save": -2 },
+      "con": { "score": 14, "mod": 2, "save": 2 },
+      "int": { "score": 2, "mod": -4, "save": -4 },
+      "wis": { "score": 6, "mod": -2, "save": -2 },
+      "cha": { "score": 1, "mod": -5, "save": -5 }
+    },
+    "skills": {},
+    "resistances": ["Acid"],
+    "immunities": ["Lightning", "Slashing"],
+    "senses": "Blindsight 60 ft. (blind beyond this radius), Passive Perception 8",
+    "languages": "—",
+    "traits": [
+      {
+        "name": "Amorphous",
+        "text": "The jelly can move through a space as narrow as 1 inch wide without squeezing."
+      },
+      {
+        "name": "Spider Climb",
+        "text": "The jelly can climb difficult surfaces, including upside down on ceilings, without needing to make an ability check."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Pseudopod",
+        "text": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 9 (2d6 + 2) bludgeoning damage plus 3 (1d6) acid damage."
+      },
+      {
+        "name": "Split (Reaction)",
+        "text": "When a jelly that is Medium or larger is subjected to lightning or slashing damage, it splits into two new jellies if it has at least 10 hit points. Each new jelly has hit points equal to half the original jelly's, rounded down. New jellies are one size smaller than the original jelly."
+      }
+    ]
+  },
+  {
+    "name": "Ghoul",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Undead",
+    "alignment": "Chaotic Evil",
+    "ac": 12,
+    "init": 2,
+    "hp_avg": 22,
+    "hp_formula": "5d8",
+    "speed": { "walk": 30 },
+    "cr": "1",
+    "xp": 200,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 13, "mod": 1, "save": 1 },
+      "dex": { "score": 15, "mod": 2, "save": 2 },
+      "con": { "score": 10, "mod": 0, "save": 0 },
+      "int": { "score": 7, "mod": -2, "save": -2 },
+      "wis": { "score": 10, "mod": 0, "save": 0 },
+      "cha": { "score": 6, "mod": -2, "save": -2 }
+    },
+    "skills": {},
+    "immunities": ["Poison"],
+    "senses": "Darkvision 60 ft., Passive Perception 10",
+    "languages": "Common",
+    "traits": [],
+    "actions": [
+      {
+        "name": "Bite",
+        "text": "Melee Weapon Attack: +2 to hit, reach 5 ft., one creature. Hit: 9 (2d6 + 2) piercing damage."
+      },
+      {
+        "name": "Claws",
+        "text": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 7 (2d4 + 2) slashing damage. If the target is a creature other than an elf or undead, it must succeed on a DC 10 Constitution saving throw or be paralyzed for 1 minute. The target can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success."
+      }
+    ]
+  },
+  {
+    "name": "Skeleton",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Undead",
+    "alignment": "Lawful Evil",
+    "ac": 13,
+    "init": 2,
+    "hp_avg": 13,
+    "hp_formula": "2d8 + 4",
+    "speed": { "walk": 30 },
+    "cr": "1/4",
+    "xp": 50,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 10, "mod": 0, "save": 0 },
+      "dex": { "score": 14, "mod": 2, "save": 2 },
+      "con": { "score": 15, "mod": 2, "save": 2 },
+      "int": { "score": 6, "mod": -2, "save": -2 },
+      "wis": { "score": 8, "mod": -1, "save": -1 },
+      "cha": { "score": 5, "mod": -3, "save": -3 }
+    },
+    "skills": {},
+    "vulnerabilities": ["Bludgeoning"],
+    "immunities": ["Poison"],
+    "senses": "Darkvision 60 ft., Passive Perception 9",
+    "languages": "Understands all languages it knew in life but can't speak",
+    "traits": [],
+    "actions": [
+      {
+        "name": "Shortsword",
+        "text": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 5 (1d6 + 2) piercing damage."
+      },
+      {
+        "name": "Shortbow",
+        "text": "Ranged Weapon Attack: +4 to hit, range 80/320 ft., one target. Hit: 5 (1d6 + 2) piercing damage."
+      }
+    ]
+  },
+  {
+    "name": "Zombie",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Undead",
+    "alignment": "Neutral Evil",
+    "ac": 8,
+    "init": -2,
+    "hp_avg": 22,
+    "hp_formula": "3d8 + 9",
+    "speed": { "walk": 20 },
+    "cr": "1/4",
+    "xp": 50,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 13, "mod": 1, "save": 1 },
+      "dex": { "score": 6, "mod": -2, "save": -2 },
+      "con": { "score": 16, "mod": 3, "save": 3 },
+      "int": { "score": 3, "mod": -4, "save": -4 },
+      "wis": { "score": 6, "mod": -2, "save": 0 },
+      "cha": { "score": 5, "mod": -3, "save": -3 }
+    },
+    "skills": {},
+    "immunities": ["Poison"],
+    "senses": "Darkvision 60 ft., Passive Perception 8",
+    "languages": "Understands the languages it knew in life but can't speak",
+    "traits": [
+      {
+        "name": "Undead Fortitude",
+        "text": "If damage reduces the zombie to 0 hit points, it must make a Constitution saving throw with a DC of 5 + the damage taken, unless the damage is radiant or from a critical hit. On a success, the zombie drops to 1 hit point instead."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Slam",
+        "text": "Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 4 (1d6 + 1) bludgeoning damage."
+      }
+    ]
+  },
+  {
+    "name": "Stirge",
+    "source": "SRD 5.1",
+    "size": "Tiny",
+    "type": "Beast",
+    "alignment": "Unaligned",
+    "ac": 14,
+    "init": 3,
+    "hp_avg": 2,
+    "hp_formula": "1d4",
+    "speed": { "walk": 10, "fly": 40 },
+    "cr": "1/8",
+    "xp": 25,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 4, "mod": -3, "save": -3 },
+      "dex": { "score": 16, "mod": 3, "save": 3 },
+      "con": { "score": 11, "mod": 0, "save": 0 },
+      "int": { "score": 2, "mod": -4, "save": -4 },
+      "wis": { "score": 8, "mod": -1, "save": -1 },
+      "cha": { "score": 6, "mod": -2, "save": -2 }
+    },
+    "skills": {},
+    "senses": "Darkvision 60 ft., Passive Perception 9",
+    "languages": "—",
+    "traits": [],
+    "actions": [
+      {
+        "name": "Blood Drain",
+        "text": "Melee Weapon Attack: +5 to hit, reach 5 ft., one creature. Hit: 5 (1d4 + 3) piercing damage, and the stirge attaches to the target. While attached, the stirge doesn't attack. Instead, at the start of each of the stirge's turns, the target loses 5 (1d4 + 3) hit points due to blood loss. The stirge can detach itself by spending 5 feet of its movement. It does so after it drains 10 hit points of blood from the target or the target dies. A creature, including the target, can use its action to detach the stirge."
+      }
+    ]
+  },
+  {
+    "name": "Orc",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Humanoid (Orc)",
+    "alignment": "Chaotic Evil",
+    "ac": 13,
+    "init": 1,
+    "hp_avg": 15,
+    "hp_formula": "2d8 + 6",
+    "speed": { "walk": 30 },
+    "cr": "1/2",
+    "xp": 100,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 16, "mod": 3, "save": 3 },
+      "dex": { "score": 12, "mod": 1, "save": 1 },
+      "con": { "score": 16, "mod": 3, "save": 3 },
+      "int": { "score": 7, "mod": -2, "save": -2 },
+      "wis": { "score": 11, "mod": 0, "save": 0 },
+      "cha": { "score": 10, "mod": 0, "save": 0 }
+    },
+    "skills": { "Intimidation": 2 },
+    "senses": "Darkvision 60 ft., Passive Perception 10",
+    "languages": "Common, Orc",
+    "traits": [
+      {
+        "name": "Aggressive",
+        "text": "As a bonus action, the orc can move up to its speed toward a hostile creature that it can see."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Greataxe",
+        "text": "Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 9 (1d12 + 3) slashing damage."
+      },
+      {
+        "name": "Javelin",
+        "text": "Melee or Ranged Weapon Attack: +5 to hit, reach 5 ft. or range 30/120 ft., one target. Hit: 6 (1d6 + 3) piercing damage."
+      }
+    ]
+  },
+  {
+    "name": "Ogre",
+    "source": "SRD 5.1",
+    "size": "Large",
+    "type": "Giant",
+    "alignment": "Chaotic Evil",
+    "ac": 11,
+    "init": -1,
+    "hp_avg": 59,
+    "hp_formula": "7d10 + 21",
+    "speed": { "walk": 40 },
+    "cr": "2",
+    "xp": 450,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 19, "mod": 4, "save": 4 },
+      "dex": { "score": 8, "mod": -1, "save": -1 },
+      "con": { "score": 16, "mod": 3, "save": 3 },
+      "int": { "score": 5, "mod": -3, "save": -3 },
+      "wis": { "score": 7, "mod": -2, "save": -2 },
+      "cha": { "score": 7, "mod": -2, "save": -2 }
+    },
+    "skills": {},
+    "senses": "Darkvision 60 ft., Passive Perception 8",
+    "languages": "Common, Giant",
+    "traits": [],
+    "actions": [
+      {
+        "name": "Greatclub",
+        "text": "Melee Weapon Attack: +6 to hit, reach 5 ft., one target. Hit: 13 (2d8 + 4) bludgeoning damage."
+      },
+      {
+        "name": "Javelin",
+        "text": "Melee or Ranged Weapon Attack: +6 to hit, reach 5 ft. or range 30/120 ft., one target. Hit: 11 (2d6 + 4) piercing damage."
+      }
+    ]
+  },
+  {
+    "name": "Owlbear",
+    "source": "SRD 5.1",
+    "size": "Large",
+    "type": "Monstrosity",
+    "alignment": "Unaligned",
+    "ac": 13,
+    "init": 1,
+    "hp_avg": 59,
+    "hp_formula": "7d10 + 21",
+    "speed": { "walk": 40 },
+    "cr": "3",
+    "xp": 700,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 20, "mod": 5, "save": 5 },
+      "dex": { "score": 12, "mod": 1, "save": 1 },
+      "con": { "score": 17, "mod": 3, "save": 3 },
+      "int": { "score": 3, "mod": -4, "save": -4 },
+      "wis": { "score": 12, "mod": 1, "save": 1 },
+      "cha": { "score": 7, "mod": -2, "save": -2 }
+    },
+    "skills": { "Perception": 3 },
+    "senses": "Darkvision 60 ft., Passive Perception 13",
+    "languages": "—",
+    "traits": [
+      {
+        "name": "Keen Sight and Smell",
+        "text": "The owlbear has advantage on Wisdom (Perception) checks that rely on sight or smell."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Multiattack",
+        "text": "The owlbear makes two attacks: one with its beak and one with its claws."
+      },
+      {
+        "name": "Beak",
+        "text": "Melee Weapon Attack: +7 to hit, reach 5 ft., one creature. Hit: 10 (1d10 + 5) piercing damage."
+      },
+      {
+        "name": "Claws",
+        "text": "Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 14 (2d8 + 5) slashing damage."
+      }
+    ]
+  },
+  {
+    "name": "Nothic",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Aberration",
+    "alignment": "Neutral Evil",
+    "ac": 15,
+    "init": 3,
+    "hp_avg": 45,
+    "hp_formula": "6d8 + 18",
+    "speed": { "walk": 30 },
+    "cr": "2",
+    "xp": 450,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 14, "mod": 2, "save": 2 },
+      "dex": { "score": 16, "mod": 3, "save": 3 },
+      "con": { "score": 16, "mod": 3, "save": 3 },
+      "int": { "score": 13, "mod": 1, "save": 1 },
+      "wis": { "score": 10, "mod": 0, "save": 0 },
+      "cha": { "score": 8, "mod": -1, "save": -1 }
+    },
+    "skills": { "Arcana": 3, "Insight": 4, "Perception": 2, "Stealth": 5 },
+    "senses": "Truesight 120 ft., Passive Perception 12",
+    "languages": "Undercommon",
+    "traits": [
+      {
+        "name": "Keen Sight",
+        "text": "The nothic has advantage on Wisdom (Perception) checks that rely on sight."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Multiattack",
+        "text": "The nothic makes two claw attacks."
+      },
+      {
+        "name": "Claw",
+        "text": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 6 (1d6 + 3) slashing damage."
+      },
+      {
+        "name": "Rotting Gaze",
+        "text": "The nothic targets one creature it can see within 30 feet of it. The target must succeed on a DC 12 Constitution saving throw against this magic or take 10 (3d6) necrotic damage."
+      },
+      {
+        "name": "Weird Insight",
+        "text": "The nothic targets one creature it can see within 30 feet of it. The target must contest its Charisma (Deception) check against the nothic's Wisdom (Insight) check. If the nothic wins, it magically learns one fact or secret about the target. The target automatically wins if it is immune to being charmed."
+      }
+    ]
+  },
+  {
+    "name": "Grick",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Monstrosity",
+    "alignment": "Neutral",
+    "ac": 14,
+    "init": 2,
+    "hp_avg": 27,
+    "hp_formula": "6d8",
+    "speed": { "walk": 30, "climb": 30 },
+    "cr": "2",
+    "xp": 450,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 14, "mod": 2, "save": 2 },
+      "dex": { "score": 14, "mod": 2, "save": 2 },
+      "con": { "score": 11, "mod": 0, "save": 0 },
+      "int": { "score": 3, "mod": -4, "save": -4 },
+      "wis": { "score": 14, "mod": 2, "save": 2 },
+      "cha": { "score": 5, "mod": -3, "save": -3 }
+    },
+    "skills": {},
+    "resistances": ["Bludgeoning, piercing, and slashing from nonmagical attacks"],
+    "senses": "Darkvision 60 ft., Passive Perception 12",
+    "languages": "—",
+    "traits": [
+      {
+        "name": "Stone Camouflage",
+        "text": "The grick has advantage on Dexterity (Stealth) checks made to hide in rocky terrain."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Multiattack",
+        "text": "The grick makes one attack with its tentacles. If that attack hits, the grick can make one beak attack against the same target."
+      },
+      {
+        "name": "Tentacles",
+        "text": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 9 (2d6 + 2) slashing damage."
+      },
+      {
+        "name": "Beak",
+        "text": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 9 (2d6 + 2) piercing damage."
+      }
+    ]
+  },
+  {
+    "name": "Twig Blight",
+    "source": "SRD 5.1",
+    "size": "Small",
+    "type": "Plant",
+    "alignment": "Neutral Evil",
+    "ac": 13,
+    "init": 1,
+    "hp_avg": 4,
+    "hp_formula": "1d6 + 1",
+    "speed": { "walk": 20 },
+    "cr": "1/8",
+    "xp": 25,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 6, "mod": -2, "save": -2 },
+      "dex": { "score": 13, "mod": 1, "save": 1 },
+      "con": { "score": 12, "mod": 1, "save": 1 },
+      "int": { "score": 4, "mod": -3, "save": -3 },
+      "wis": { "score": 8, "mod": -1, "save": -1 },
+      "cha": { "score": 3, "mod": -4, "save": -4 }
+    },
+    "skills": { "Stealth": 3 },
+    "vulnerabilities": ["Fire"],
+    "senses": "Blindsight 60 ft. (blind beyond this radius), Passive Perception 9",
+    "languages": "Understands Common but can't speak",
+    "traits": [
+      {
+        "name": "False Appearance",
+        "text": "While the blight remains motionless, it is indistinguishable from a dead shrub."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Claws",
+        "text": "Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 3 (1d4 + 1) piercing damage."
+      }
+    ]
+  },
+  {
+    "name": "Doppelganger",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Monstrosity (Shapechanger)",
+    "alignment": "Neutral",
+    "ac": 14,
+    "init": 4,
+    "hp_avg": 52,
+    "hp_formula": "8d8 + 16",
+    "speed": { "walk": 30 },
+    "cr": "3",
+    "xp": 700,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 11, "mod": 0, "save": 0 },
+      "dex": { "score": 18, "mod": 4, "save": 4 },
+      "con": { "score": 14, "mod": 2, "save": 2 },
+      "int": { "score": 11, "mod": 0, "save": 0 },
+      "wis": { "score": 12, "mod": 1, "save": 1 },
+      "cha": { "score": 14, "mod": 2, "save": 2 }
+    },
+    "skills": { "Deception": 6, "Insight": 3 },
+    "senses": "Darkvision 60 ft., Passive Perception 11",
+    "languages": "Common",
+    "traits": [
+      {
+        "name": "Shapechanger",
+        "text": "The doppelganger can use its action to polymorph into a Small or Medium humanoid it has seen, or back into its true form. Its statistics, other than its size, are the same in each form. Any equipment it is wearing or carrying isn't transformed. It reverts to its true form if it dies."
+      },
+      {
+        "name": "Ambusher",
+        "text": "The doppelganger has advantage on attack rolls against any creature it has surprised."
+      },
+      {
+        "name": "Surprise Attack",
+        "text": "If the doppelganger surprises a creature and hits it with an attack during the first round of combat, the target takes an extra 10 (3d6) damage from the attack."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Multiattack",
+        "text": "The doppelganger makes two melee attacks."
+      },
+      {
+        "name": "Slam",
+        "text": "Melee Weapon Attack: +6 to hit, reach 5 ft., one target. Hit: 7 (1d6 + 4) bludgeoning damage."
+      },
+      {
+        "name": "Read Thoughts",
+        "text": "The doppelganger magically reads the surface thoughts of one creature within 60 feet of it. The effect can penetrate barriers, but 3 feet of wood or dirt, 2 feet of stone, 2 inches of metal, or a thin sheet of lead blocks it. While the target is in range, the doppelganger can continue reading its thoughts, as long as the doppelganger's concentration isn't broken. While reading the target's mind, the doppelganger has advantage on Wisdom (Insight) and Charisma (Deception, Intimidation, and Persuasion) checks against the target."
+      }
+    ]
+  },
+  {
+    "name": "Wraith",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Undead",
+    "alignment": "Neutral Evil",
+    "ac": 13,
+    "init": 3,
+    "hp_avg": 67,
+    "hp_formula": "9d8 + 27",
+    "speed": { "walk": 0, "fly": 60 },
+    "cr": "5",
+    "xp": 1800,
+    "pb": 3,
+    "abilities": {
+      "str": { "score": 6, "mod": -2, "save": -2 },
+      "dex": { "score": 16, "mod": 3, "save": 3 },
+      "con": { "score": 16, "mod": 3, "save": 3 },
+      "int": { "score": 12, "mod": 1, "save": 1 },
+      "wis": { "score": 14, "mod": 2, "save": 2 },
+      "cha": { "score": 15, "mod": 2, "save": 2 }
+    },
+    "skills": {},
+    "resistances": [
+      "Acid",
+      "Cold",
+      "Fire",
+      "Lightning",
+      "Thunder",
+      "Bludgeoning, piercing, and slashing from nonmagical attacks that aren't silvered"
+    ],
+    "immunities": ["Necrotic", "Poison"],
+    "senses": "Darkvision 60 ft., Passive Perception 12",
+    "languages": "The languages it knew in life",
+    "traits": [
+      {
+        "name": "Incorporeal Movement",
+        "text": "The wraith can move through other creatures and objects as if they were difficult terrain. It takes 5 (1d10) force damage if it ends its turn inside an object."
+      },
+      {
+        "name": "Sunlight Sensitivity",
+        "text": "While in sunlight, the wraith has disadvantage on attack rolls, as well as on Wisdom (Perception) checks that rely on sight."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Life Drain",
+        "text": "Melee Weapon Attack: +6 to hit, reach 5 ft., one creature. Hit: 21 (4d8 + 3) necrotic damage. The target must succeed on a DC 14 Constitution saving throw or its hit point maximum is reduced by an amount equal to the damage taken. This reduction lasts until the creature finishes a long rest. The target dies if this effect reduces its hit point maximum to 0."
+      },
+      {
+        "name": "Create Specter",
+        "text": "The wraith targets a humanoid within 10 feet of it that has been dead for no longer than 1 minute and died violently. The target's spirit rises as a specter in the space of its corpse or in the nearest unoccupied space. The specter is under the wraith's control. The wraith can have no more than seven specters under its control at one time."
+      }
+    ]
+  },
+  {
+    "name": "Banshee",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Undead",
+    "alignment": "Chaotic Evil",
+    "ac": 12,
+    "init": 2,
+    "hp_avg": 58,
+    "hp_formula": "13d8",
+    "speed": { "walk": 0, "fly": 40 },
+    "cr": "4",
+    "xp": 1100,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 1, "mod": -5, "save": -5 },
+      "dex": { "score": 14, "mod": 2, "save": 2 },
+      "con": { "score": 10, "mod": 0, "save": 0 },
+      "int": { "score": 12, "mod": 1, "save": 1 },
+      "wis": { "score": 11, "mod": 0, "save": 2 },
+      "cha": { "score": 17, "mod": 3, "save": 5 }
+    },
+    "skills": {},
+    "resistances": [
+      "Acid",
+      "Fire",
+      "Lightning",
+      "Thunder",
+      "Bludgeoning, piercing, and slashing from nonmagical attacks"
+    ],
+    "immunities": ["Cold", "Necrotic", "Poison"],
+    "senses": "Darkvision 60 ft., Passive Perception 10",
+    "languages": "Common, Elvish",
+    "traits": [
+      {
+        "name": "Detect Life",
+        "text": "The banshee can magically sense the presence of creatures up to 5 miles away that aren't undead or constructs. She knows the general direction they're in but not their exact locations."
+      },
+      {
+        "name": "Incorporeal Movement",
+        "text": "The banshee can move through other creatures and objects as if they were difficult terrain. She takes 5 (1d10) force damage if she ends her turn inside an object."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Corrupting Touch",
+        "text": "Melee Spell Attack: +4 to hit, reach 5 ft., one target. Hit: 12 (3d6 + 2) necrotic damage."
+      },
+      {
+        "name": "Horrifying Visage",
+        "text": "Each non-undead creature within 60 feet of the banshee that can see her must succeed on a DC 13 Wisdom saving throw or be frightened for 1 minute. A frightened target can repeat the saving throw at the end of each of its turns, with disadvantage if the banshee is within line of sight, ending the effect on itself on a success. If a target's saving throw is successful or the effect ends for it, the target is immune to the banshee's Horrifying Visage for the next 24 hours."
+      },
+      {
+        "name": "Wail (1/Day)",
+        "text": "The banshee releases a mournful wail, provided that she isn't in sunlight. This wail has no effect on constructs and undead. All other creatures within 30 feet of her that can hear her must make a DC 13 Constitution saving throw. On a failure, a creature drops to 0 hit points. On a success, a creature takes 10 (3d6) psychic damage."
+      }
+    ]
+  },
+  {
+    "name": "Young Green Dragon",
+    "source": "SRD 5.1",
+    "size": "Large",
+    "type": "Dragon",
+    "alignment": "Lawful Evil",
+    "ac": 18,
+    "init": 1,
+    "hp_avg": 136,
+    "hp_formula": "16d10 + 48",
+    "speed": { "walk": 40, "fly": 80, "swim": 40 },
+    "cr": "8",
+    "xp": 3900,
+    "pb": 3,
+    "abilities": {
+      "str": { "score": 19, "mod": 4, "save": 4 },
+      "dex": { "score": 12, "mod": 1, "save": 4 },
+      "con": { "score": 17, "mod": 3, "save": 6 },
+      "int": { "score": 16, "mod": 3, "save": 3 },
+      "wis": { "score": 13, "mod": 1, "save": 4 },
+      "cha": { "score": 15, "mod": 2, "save": 5 }
+    },
+    "skills": { "Deception": 5, "Perception": 7, "Stealth": 4 },
+    "immunities": ["Poison"],
+    "senses": "Blindsight 30 ft., Darkvision 120 ft., Passive Perception 17",
+    "languages": "Common, Draconic",
+    "traits": [
+      {
+        "name": "Amphibious",
+        "text": "The dragon can breathe air and water."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Multiattack",
+        "text": "The dragon makes three attacks: one with its bite and two with its claws."
+      },
+      {
+        "name": "Bite",
+        "text": "Melee Weapon Attack: +7 to hit, reach 10 ft., one target. Hit: 15 (2d10 + 4) piercing damage plus 7 (2d6) poison damage."
+      },
+      {
+        "name": "Claw",
+        "text": "Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 11 (2d6 + 4) slashing damage."
+      },
+      {
+        "name": "Poison Breath (Recharge 5-6)",
+        "text": "The dragon exhales poisonous gas in a 30-foot cone. Each creature in that area must make a DC 14 Constitution saving throw, taking 42 (12d6) poison damage on a failed save, or half as much damage on a successful one."
+      }
+    ]
+  },
+  {
+    "name": "Spectator",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Aberration",
+    "alignment": "Lawful Neutral",
+    "ac": 14,
+    "init": 2,
+    "hp_avg": 39,
+    "hp_formula": "6d8 + 12",
+    "speed": { "walk": 0, "fly": 30 },
+    "cr": "3",
+    "xp": 700,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 8, "mod": -1, "save": -1 },
+      "dex": { "score": 14, "mod": 2, "save": 2 },
+      "con": { "score": 14, "mod": 2, "save": 2 },
+      "int": { "score": 13, "mod": 1, "save": 1 },
+      "wis": { "score": 14, "mod": 2, "save": 2 },
+      "cha": { "score": 11, "mod": 0, "save": 0 }
+    },
+    "skills": { "Perception": 6 },
+    "senses": "Darkvision 120 ft., Passive Perception 16",
+    "languages": "Deep Speech, Undercommon, telepathy 120 ft.",
+    "traits": [],
+    "actions": [
+      {
+        "name": "Bite",
+        "text": "Melee Weapon Attack: +1 to hit, reach 5 ft., one creature. Hit: 2 (1d6 - 1) piercing damage."
+      },
+      {
+        "name": "Eye Rays",
+        "text": "The spectator shoots up to two of the following magical eye rays at one or two creatures it can see within 90 feet of it. It can use each ray only once on a turn. 1. Confusion Ray. The target must succeed on a DC 13 Wisdom saving throw, or it can't take reactions until the end of its next turn. On its turn, the target can't move, and it uses its action to make a melee or ranged attack against a randomly determined creature within range. 2. Paralyzing Ray. The target must succeed on a DC 13 Constitution saving throw or be paralyzed for 1 minute. 3. Fear Ray. The target must succeed on a DC 13 Wisdom saving throw or be frightened for 1 minute. 4. Wounding Ray. The target must make a DC 13 Constitution saving throw, taking 16 (3d10) necrotic damage on a failed save, or half as much damage on a successful one."
+      },
+      {
+        "name": "Spell Reflection (Reaction)",
+        "text": "If the spectator makes a successful saving throw against a spell, or a spell attack misses it, the spectator can choose another creature it can see within 30 feet of it. The spell targets the chosen creature instead."
+      }
+    ]
+  },
+  {
+    "name": "Flameskull",
+    "source": "SRD 5.1",
+    "size": "Tiny",
+    "type": "Undead",
+    "alignment": "Neutral Evil",
+    "ac": 13,
+    "init": 3,
+    "hp_avg": 40,
+    "hp_formula": "9d4 + 18",
+    "speed": { "walk": 0, "fly": 40 },
+    "cr": "4",
+    "xp": 1100,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 1, "mod": -5, "save": -5 },
+      "dex": { "score": 17, "mod": 3, "save": 3 },
+      "con": { "score": 14, "mod": 2, "save": 2 },
+      "int": { "score": 16, "mod": 3, "save": 3 },
+      "wis": { "score": 10, "mod": 0, "save": 0 },
+      "cha": { "score": 11, "mod": 0, "save": 0 }
+    },
+    "skills": { "Arcana": 5, "History": 5 },
+    "resistances": ["Lightning", "Necrotic", "Piercing"],
+    "immunities": ["Cold", "Fire", "Poison"],
+    "senses": "Darkvision 60 ft., Passive Perception 10",
+    "languages": "Common",
+    "traits": [
+      {
+        "name": "Illumination",
+        "text": "The flameskull sheds either dim light in a 15-foot radius, or bright light in a 15-foot radius and dim light for an additional 15 feet. It can switch between the options as an action."
+      },
+      {
+        "name": "Magic Resistance",
+        "text": "The flameskull has advantage on saving throws against spells and other magical effects."
+      },
+      {
+        "name": "Rejuvenation",
+        "text": "If the flameskull is destroyed, it regains all its hit points in 1 hour unless holy water is sprinkled on its remains or a dispel evil and good spell is cast on them."
+      },
+      {
+        "name": "Spellcasting",
+        "text": "The flameskull is a 5th-level spellcaster. Its spellcasting ability is Intelligence (spell save DC 13, +5 to hit with spell attacks). It requires no somatic or material components to cast its spells. The flameskull has the following wizard spells prepared: Cantrips (at will): mage hand; 1st level (3 slots): magic missile, shield; 2nd level (2 slots): blur, flaming sphere; 3rd level (1 slot): fireball."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Multiattack",
+        "text": "The flameskull uses Fire Ray twice."
+      },
+      {
+        "name": "Fire Ray",
+        "text": "Ranged Spell Attack: +5 to hit, range 30 ft., one target. Hit: 10 (3d6) fire damage."
+      }
+    ]
+  },
+  {
+    "name": "Mage",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Humanoid",
+    "alignment": "Any Alignment",
+    "ac": 12,
+    "init": 2,
+    "hp_avg": 40,
+    "hp_formula": "9d8",
+    "speed": { "walk": 30 },
+    "cr": "6",
+    "xp": 2300,
+    "pb": 3,
+    "abilities": {
+      "str": { "score": 9, "mod": -1, "save": -1 },
+      "dex": { "score": 14, "mod": 2, "save": 2 },
+      "con": { "score": 11, "mod": 0, "save": 0 },
+      "int": { "score": 17, "mod": 3, "save": 6 },
+      "wis": { "score": 12, "mod": 1, "save": 4 },
+      "cha": { "score": 11, "mod": 0, "save": 0 }
+    },
+    "skills": { "Arcana": 6, "History": 6 },
+    "senses": "Passive Perception 11",
+    "languages": "Any four languages",
+    "traits": [
+      {
+        "name": "Spellcasting",
+        "text": "The mage is an 9th-level spellcaster. Its spellcasting ability is Intelligence (spell save DC 14, +6 to hit with spell attacks). The mage has the following wizard spells prepared: Cantrips (at will): fire bolt, light, mage hand, prestidigitation; 1st level (4 slots): detect magic, mage armor, magic missile, shield; 2nd level (3 slots): misty step, suggestion; 3rd level (3 slots): counterspell, fireball, fly; 4th level (3 slots): greater invisibility, ice storm; 5th level (1 slot): cone of cold."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Dagger",
+        "text": "Melee or Ranged Weapon Attack: +5 to hit, reach 5 ft. or range 20/60 ft., one target. Hit: 4 (1d4 + 2) piercing damage."
+      }
+    ]
+  },
+  {
+    "name": "Veteran",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Humanoid",
+    "alignment": "Any Alignment",
+    "ac": 17,
+    "init": 1,
+    "hp_avg": 58,
+    "hp_formula": "9d8 + 18",
+    "speed": { "walk": 30 },
+    "cr": "3",
+    "xp": 700,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 16, "mod": 3, "save": 3 },
+      "dex": { "score": 13, "mod": 1, "save": 1 },
+      "con": { "score": 14, "mod": 2, "save": 2 },
+      "int": { "score": 10, "mod": 0, "save": 0 },
+      "wis": { "score": 11, "mod": 0, "save": 0 },
+      "cha": { "score": 10, "mod": 0, "save": 0 }
+    },
+    "skills": { "Athletics": 5, "Perception": 2 },
+    "senses": "Passive Perception 12",
+    "languages": "Any one language (usually Common)",
+    "traits": [],
+    "actions": [
+      {
+        "name": "Multiattack",
+        "text": "The veteran makes two longsword attacks. If it has a shortsword drawn, it can also make a shortsword attack."
+      },
+      {
+        "name": "Longsword",
+        "text": "Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 7 (1d8 + 3) slashing damage, or 8 (1d10 + 3) slashing damage if used with two hands."
+      },
+      {
+        "name": "Shortsword",
+        "text": "Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 6 (1d6 + 3) piercing damage."
+      },
+      {
+        "name": "Heavy Crossbow",
+        "text": "Ranged Weapon Attack: +3 to hit, range 100/400 ft., one target. Hit: 6 (1d10 + 1) piercing damage."
+      }
+    ]
+  },
+  {
+    "name": "Bandit",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Humanoid",
+    "alignment": "Any Non-Lawful Alignment",
+    "ac": 12,
+    "init": 1,
+    "hp_avg": 11,
+    "hp_formula": "2d8 + 2",
+    "speed": { "walk": 30 },
+    "cr": "1/8",
+    "xp": 25,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 11, "mod": 0, "save": 0 },
+      "dex": { "score": 12, "mod": 1, "save": 1 },
+      "con": { "score": 12, "mod": 1, "save": 1 },
+      "int": { "score": 10, "mod": 0, "save": 0 },
+      "wis": { "score": 10, "mod": 0, "save": 0 },
+      "cha": { "score": 10, "mod": 0, "save": 0 }
+    },
+    "skills": {},
+    "senses": "Passive Perception 10",
+    "languages": "Any one language (usually Common)",
+    "traits": [],
+    "actions": [
+      {
+        "name": "Scimitar",
+        "text": "Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 4 (1d6 + 1) slashing damage."
+      },
+      {
+        "name": "Light Crossbow",
+        "text": "Ranged Weapon Attack: +3 to hit, range 80/320 ft., one target. Hit: 5 (1d8 + 1) piercing damage."
+      }
+    ]
+  },
+  {
+    "name": "Thug",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Humanoid",
+    "alignment": "Any Non-Good Alignment",
+    "ac": 11,
+    "init": 0,
+    "hp_avg": 32,
+    "hp_formula": "5d8 + 10",
+    "speed": { "walk": 30 },
+    "cr": "1/2",
+    "xp": 100,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 15, "mod": 2, "save": 2 },
+      "dex": { "score": 11, "mod": 0, "save": 0 },
+      "con": { "score": 14, "mod": 2, "save": 2 },
+      "int": { "score": 10, "mod": 0, "save": 0 },
+      "wis": { "score": 10, "mod": 0, "save": 0 },
+      "cha": { "score": 11, "mod": 0, "save": 0 }
+    },
+    "skills": { "Intimidation": 2 },
+    "senses": "Passive Perception 10",
+    "languages": "Any one language (usually Common)",
+    "traits": [
+      {
+        "name": "Pack Tactics",
+        "text": "The thug has advantage on an attack roll against a creature if at least one of the thug's allies is within 5 feet of the creature and the ally isn't incapacitated."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Multiattack",
+        "text": "The thug makes two melee attacks."
+      },
+      {
+        "name": "Mace",
+        "text": "Melee Weapon Attack: +4 to hit, reach 5 ft., one creature. Hit: 5 (1d6 + 2) bludgeoning damage."
+      },
+      {
+        "name": "Heavy Crossbow",
+        "text": "Ranged Weapon Attack: +2 to hit, range 100/400 ft., one target. Hit: 5 (1d10) piercing damage."
+      }
+    ]
+  },
+  {
+    "name": "Spy",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Humanoid",
+    "alignment": "Any Alignment",
+    "ac": 12,
+    "init": 2,
+    "hp_avg": 27,
+    "hp_formula": "6d8",
+    "speed": { "walk": 30 },
+    "cr": "1",
+    "xp": 200,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 10, "mod": 0, "save": 0 },
+      "dex": { "score": 15, "mod": 2, "save": 2 },
+      "con": { "score": 10, "mod": 0, "save": 0 },
+      "int": { "score": 12, "mod": 1, "save": 1 },
+      "wis": { "score": 14, "mod": 2, "save": 2 },
+      "cha": { "score": 16, "mod": 3, "save": 3 }
+    },
+    "skills": {
+      "Deception": 5,
+      "Insight": 4,
+      "Investigation": 5,
+      "Perception": 6,
+      "Persuasion": 5,
+      "Sleight of Hand": 4,
+      "Stealth": 4
+    },
+    "senses": "Passive Perception 16",
+    "languages": "Any two languages",
+    "traits": [
+      {
+        "name": "Cunning Action",
+        "text": "On each of its turns, the spy can use a bonus action to take the Dash, Disengage, or Hide action."
+      },
+      {
+        "name": "Sneak Attack (1/Turn)",
+        "text": "The spy deals an extra 7 (2d6) damage when it hits a target with a weapon attack and has advantage on the attack roll, or when the target is within 5 feet of an ally of the spy that isn't incapacitated and the spy doesn't have disadvantage on the attack roll."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Multiattack",
+        "text": "The spy makes two melee attacks."
+      },
+      {
+        "name": "Shortsword",
+        "text": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 5 (1d6 + 2) piercing damage."
+      },
+      {
+        "name": "Hand Crossbow",
+        "text": "Ranged Weapon Attack: +4 to hit, range 30/120 ft., one target. Hit: 5 (1d6 + 2) piercing damage."
+      }
+    ]
+  },
+  {
+    "name": "Scout",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Humanoid",
+    "alignment": "Any Alignment",
+    "ac": 13,
+    "init": 2,
+    "hp_avg": 16,
+    "hp_formula": "3d8 + 3",
+    "speed": { "walk": 30 },
+    "cr": "1/2",
+    "xp": 100,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 11, "mod": 0, "save": 0 },
+      "dex": { "score": 14, "mod": 2, "save": 2 },
+      "con": { "score": 12, "mod": 1, "save": 1 },
+      "int": { "score": 11, "mod": 0, "save": 0 },
+      "wis": { "score": 13, "mod": 1, "save": 1 },
+      "cha": { "score": 11, "mod": 0, "save": 0 }
+    },
+    "skills": { "Nature": 4, "Perception": 5, "Stealth": 6, "Survival": 5 },
+    "senses": "Passive Perception 15",
+    "languages": "Any one language (usually Common)",
+    "traits": [
+      {
+        "name": "Keen Hearing and Sight",
+        "text": "The scout has advantage on Wisdom (Perception) checks that rely on hearing or sight."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Multiattack",
+        "text": "The scout makes two melee attacks or two ranged attacks."
+      },
+      {
+        "name": "Shortsword",
+        "text": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 5 (1d6 + 2) piercing damage."
+      },
+      {
+        "name": "Longbow",
+        "text": "Ranged Weapon Attack: +4 to hit, range 150/600 ft., one target. Hit: 6 (1d8 + 2) piercing damage."
+      }
+    ]
+  },
+  {
+    "name": "Cultist",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Humanoid",
+    "alignment": "Any Non-Good Alignment",
+    "ac": 12,
+    "init": 1,
+    "hp_avg": 9,
+    "hp_formula": "2d8",
+    "speed": { "walk": 30 },
+    "cr": "1/8",
+    "xp": 25,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 11, "mod": 0, "save": 0 },
+      "dex": { "score": 12, "mod": 1, "save": 1 },
+      "con": { "score": 10, "mod": 0, "save": 0 },
+      "int": { "score": 10, "mod": 0, "save": 0 },
+      "wis": { "score": 11, "mod": 0, "save": 0 },
+      "cha": { "score": 10, "mod": 0, "save": 0 }
+    },
+    "skills": { "Deception": 2, "Religion": 2 },
+    "senses": "Passive Perception 10",
+    "languages": "Any one language (usually Common)",
+    "traits": [
+      {
+        "name": "Dark Devotion",
+        "text": "The cultist has advantage on saving throws against being charmed or frightened."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Scimitar",
+        "text": "Melee Weapon Attack: +3 to hit, reach 5 ft., one creature. Hit: 4 (1d6 + 1) slashing damage."
+      }
+    ]
+  },
+  {
+    "name": "Acolyte",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Humanoid",
+    "alignment": "Any Alignment",
+    "ac": 10,
+    "init": 0,
+    "hp_avg": 9,
+    "hp_formula": "2d8",
+    "speed": { "walk": 30 },
+    "cr": "1/4",
+    "xp": 50,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 10, "mod": 0, "save": 0 },
+      "dex": { "score": 10, "mod": 0, "save": 0 },
+      "con": { "score": 10, "mod": 0, "save": 0 },
+      "int": { "score": 10, "mod": 0, "save": 0 },
+      "wis": { "score": 14, "mod": 2, "save": 2 },
+      "cha": { "score": 11, "mod": 0, "save": 0 }
+    },
+    "skills": { "Medicine": 4, "Religion": 2 },
+    "senses": "Passive Perception 12",
+    "languages": "Any one language (usually Common)",
+    "traits": [
+      {
+        "name": "Spellcasting",
+        "text": "The acolyte is a 1st-level spellcaster. Its spellcasting ability is Wisdom (spell save DC 12, +4 to hit with spell attacks). The acolyte has following cleric spells prepared: Cantrips (at will): light, sacred flame, thaumaturgy; 1st level (3 slots): bless, cure wounds, sanctuary."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Club",
+        "text": "Melee Weapon Attack: +2 to hit, reach 5 ft., one target. Hit: 2 (1d4) bludgeoning damage."
+      }
+    ]
+  },
+  {
+    "name": "Noble",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Humanoid",
+    "alignment": "Any Alignment",
+    "ac": 15,
+    "init": 1,
+    "hp_avg": 9,
+    "hp_formula": "2d8",
+    "speed": { "walk": 30 },
+    "cr": "1/8",
+    "xp": 25,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 11, "mod": 0, "save": 0 },
+      "dex": { "score": 12, "mod": 1, "save": 1 },
+      "con": { "score": 11, "mod": 0, "save": 0 },
+      "int": { "score": 12, "mod": 1, "save": 1 },
+      "wis": { "score": 14, "mod": 2, "save": 2 },
+      "cha": { "score": 16, "mod": 3, "save": 3 }
+    },
+    "skills": { "Deception": 5, "Insight": 4, "Persuasion": 5 },
+    "senses": "Passive Perception 12",
+    "languages": "Any two languages",
+    "traits": [],
+    "actions": [
+      {
+        "name": "Rapier",
+        "text": "Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 5 (1d8 + 1) piercing damage."
+      },
+      {
+        "name": "Parry (Reaction)",
+        "text": "The noble adds 2 to its AC against one melee attack that would hit it. To do so, the noble must see the attacker and be wielding a melee weapon."
+      }
+    ]
+  },
+  {
+    "name": "Commoner",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Humanoid",
+    "alignment": "Any Alignment",
+    "ac": 10,
+    "init": 0,
+    "hp_avg": 4,
+    "hp_formula": "1d8",
+    "speed": { "walk": 30 },
+    "cr": "0",
+    "xp": 10,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 10, "mod": 0, "save": 0 },
+      "dex": { "score": 10, "mod": 0, "save": 0 },
+      "con": { "score": 10, "mod": 0, "save": 0 },
+      "int": { "score": 10, "mod": 0, "save": 0 },
+      "wis": { "score": 10, "mod": 0, "save": 0 },
+      "cha": { "score": 10, "mod": 0, "save": 0 }
+    },
+    "skills": {},
+    "senses": "Passive Perception 10",
+    "languages": "Any one language (usually Common)",
+    "traits": [],
+    "actions": [
+      {
+        "name": "Club",
+        "text": "Melee Weapon Attack: +2 to hit, reach 5 ft., one target. Hit: 2 (1d4) bludgeoning damage."
+      }
+    ]
+  },
+  {
+    "name": "Dryad",
+    "source": "SRD 5.1",
+    "size": "Medium",
+    "type": "Fey",
+    "alignment": "Neutral",
+    "ac": 11,
+    "init": 1,
+    "hp_avg": 22,
+    "hp_formula": "5d8",
+    "speed": { "walk": 30 },
+    "cr": "1",
+    "xp": 200,
+    "pb": 2,
+    "abilities": {
+      "str": { "score": 10, "mod": 0, "save": 0 },
+      "dex": { "score": 12, "mod": 1, "save": 1 },
+      "con": { "score": 11, "mod": 0, "save": 0 },
+      "int": { "score": 14, "mod": 2, "save": 2 },
+      "wis": { "score": 15, "mod": 2, "save": 2 },
+      "cha": { "score": 18, "mod": 4, "save": 4 }
+    },
+    "skills": { "Perception": 4, "Stealth": 5 },
+    "senses": "Darkvision 60 ft., Passive Perception 14",
+    "languages": "Elvish, Sylvan",
+    "traits": [
+      {
+        "name": "Innate Spellcasting",
+        "text": "The dryad's innate spellcasting ability is Charisma (spell save DC 14). The dryad can innately cast the following spells, requiring no material components: At will: druidcraft; 3/day each: entangle, goodberry; 1/day each: barkskin, pass without trace, shillelagh."
+      },
+      {
+        "name": "Magic Resistance",
+        "text": "The dryad has advantage on saving throws against spells and other magical effects."
+      },
+      {
+        "name": "Speak with Beasts and Plants",
+        "text": "The dryad can communicate with beasts and plants as if they shared a language."
+      },
+      {
+        "name": "Tree Stride",
+        "text": "Once on her turn, the dryad can use 10 feet of her movement to step magically into one living tree within her reach and emerge from a second living tree within 60 feet of the first tree, appearing in an unoccupied space within 5 feet of the second tree. Both trees must be Large or bigger."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Club",
+        "text": "Melee Weapon Attack: +2 to hit, reach 5 ft., one target. Hit: 2 (1d4) bludgeoning damage, 8 (1d8 + 4) with shillelagh."
+      },
+      {
+        "name": "Fey Charm",
+        "text": "The dryad targets one humanoid or beast that she can see within 30 feet of her. If the target can see the dryad, it must succeed on a DC 14 Wisdom saving throw or be magically charmed. The charmed creature regards the dryad as a trusted friend to be heeded and protected."
+      }
+    ]
+  }
+]

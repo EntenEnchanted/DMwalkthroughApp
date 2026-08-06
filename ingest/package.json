@@ -14,6 +14,7 @@
     "remigrate": "tsx src/remigrate.ts",
     "dump": "tsx src/dump.ts",
     "bench": "tsx src/bench.ts",
+    "creatures": "tsx src/creatures.ts",
     "load": "tsx src/load.ts"
   },
   "dependencies": {

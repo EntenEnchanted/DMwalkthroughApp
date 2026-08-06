@@ -35,6 +35,30 @@ const PAGE = 40;
 /** Absolute so the dump works whether npm resolves the script from the root or ingest/. */
 const WRANGLER_CONFIG = resolve(dirname(fileURLToPath(import.meta.url)), "../../worker/wrangler.toml");
 
+/**
+ * What the loader consumes. The block fields are optional because legacy
+ * sections omit them entirely — see the passthrough note below.
+ */
+interface DumpedSection {
+  id: string;
+  module_id: string;
+  chapter: string;
+  heading: string;
+  heading_path: string[];
+  order: number;
+  type: string;
+  reveals: Reveal[];
+  references: string[];
+  read_aloud_text: string;
+  dm_only_text: string;
+  read_alouds?: ReadAloud[];
+  background_text?: string;
+  prompts?: Prompt[];
+  technique?: NamedBlock[];
+  conditionals?: Conditional[];
+  features?: NamedBlock[];
+}
+
 interface SectionRow {
   id: string;
   chapter: string;
@@ -221,7 +245,7 @@ async function main() {
 
   const pick = <T>(map: Map<string, T[]>, id: string): T[] => (ids.has(id) ? map.get(id) ?? [] : []);
 
-  const output = sections.map((s) => {
+  const output: DumpedSection[] = sections.map((s): DumpedSection => {
     const sectionReadAlouds = pick(readAlouds, s.id).map(
       ({ ordinal, source, cue, text }): ReadAloud => ({ ordinal, source, cue, text })
     );
@@ -251,7 +275,7 @@ async function main() {
       })
     );
 
-    return {
+    const common = {
       id: s.id,
       module_id: moduleId,
       chapter: s.chapter,
@@ -259,11 +283,32 @@ async function main() {
       heading_path: JSON.parse(s.heading_path || "[]") as string[],
       order: s.order,
       type: s.type,
+      reveals: sectionReveals,
+      references: pick(references, s.id).map((r) => r.referenced_section_id),
+    };
+
+    // Creature and item sections predate the block model: their prose lives in
+    // dm_only_text with no blocks behind it. Sending them down the block path
+    // would derive both text columns from nothing and blank them, so they go
+    // back the way they came and the worker's legacy passthrough keeps them —
+    // which is what it is there for. background_text must be OMITTED, not sent
+    // empty, since merely being present is what switches derivation on.
+    const hasBlocks =
+      sectionReadAlouds.length ||
+      sectionPrompts.length ||
+      sectionTechnique.length ||
+      sectionConditionals.length ||
+      sectionFeatures.length ||
+      s.background_text;
+    if (!hasBlocks) {
+      return { ...common, read_aloud_text: s.read_aloud_text, dm_only_text: s.dm_only_text };
+    }
+
+    return {
+      ...common,
       // Derived server-side from the blocks, exactly as run.ts and remigrate.ts send them.
       read_aloud_text: "",
       dm_only_text: "",
-      reveals: sectionReveals,
-      references: pick(references, s.id).map((r) => r.referenced_section_id),
       read_alouds: sectionReadAlouds,
       background_text: s.background_text,
       prompts: sectionPrompts,
@@ -280,10 +325,22 @@ async function main() {
     for (let i = 0; i < output.length; i++) {
       const dumped = output[i];
       const stored = sections[i];
-      const readAloudOk =
-        derivedReadAloudText(dumped.read_alouds) === stored.read_aloud_text ||
-        (!dumped.read_alouds.length && !stored.read_aloud_text);
-      const dmOnlyOk = derivedDmOnlyText(dumped) === stored.dm_only_text;
+      // Legacy sections are passed through verbatim, so what the worker will
+      // store is what we sent, not something derived from blocks.
+      const legacy = !("background_text" in dumped);
+      const readAloudOk = legacy
+        ? dumped.read_aloud_text === stored.read_aloud_text
+        : derivedReadAloudText(dumped.read_alouds ?? []) === stored.read_aloud_text ||
+          (!dumped.read_alouds?.length && !stored.read_aloud_text);
+      const dmOnlyOk = legacy
+        ? dumped.dm_only_text === stored.dm_only_text
+        : derivedDmOnlyText({
+            background_text: dumped.background_text ?? "",
+            features: dumped.features ?? [],
+            conditionals: dumped.conditionals ?? [],
+            prompts: dumped.prompts ?? [],
+            technique: dumped.technique ?? [],
+          }) === stored.dm_only_text;
       if (!readAloudOk || !dmOnlyOk) {
         mismatched.push(`${dumped.id} (${!readAloudOk ? "read_aloud" : ""}${!dmOnlyOk ? " dm_only" : ""})`);
       }
@@ -300,14 +357,15 @@ async function main() {
 
   const counts = output.reduce(
     (acc, s) => ({
-      read_alouds: acc.read_alouds + s.read_alouds.length,
+      read_alouds: acc.read_alouds + (s.read_alouds?.length ?? 0),
       checks: acc.checks + s.reveals.length,
-      conditionals: acc.conditionals + s.conditionals.length,
-      prompts: acc.prompts + s.prompts.length,
-      technique: acc.technique + s.technique.length,
-      features: acc.features + s.features.length,
+      conditionals: acc.conditionals + (s.conditionals?.length ?? 0),
+      prompts: acc.prompts + (s.prompts?.length ?? 0),
+      technique: acc.technique + (s.technique?.length ?? 0),
+      features: acc.features + (s.features?.length ?? 0),
+      legacy: acc.legacy + (("background_text" in s) ? 0 : 1),
     }),
-    { read_alouds: 0, checks: 0, conditionals: 0, prompts: 0, technique: 0, features: 0 }
+    { read_alouds: 0, checks: 0, conditionals: 0, prompts: 0, technique: 0, features: 0, legacy: 0 }
   );
 
   mkdirSync("./output", { recursive: true });
@@ -318,6 +376,7 @@ async function main() {
     `  ${counts.read_alouds} read-alouds, ${counts.checks} checks, ${counts.conditionals} conditionals, ` +
       `${counts.prompts} prompts, ${counts.technique} technique, ${counts.features} features`
   );
+  if (counts.legacy) console.log(`  ${counts.legacy} pre-block sections passed through verbatim`);
 }
 
 main().catch((err) => {
