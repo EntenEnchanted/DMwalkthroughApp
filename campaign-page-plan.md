@@ -418,6 +418,31 @@ remove it, rotate `ADMIN_TOKEN`.
 `frontend/preview.html` renders the real Campaign components against the fixture
 with no API, deploy or ingest run — `npm run dev`, then `/preview.html`.
 
+### Authored sections that aren't in the book
+
+`dosi-pregen-sections.json` is hand-written content in the loader's shape, and
+loads like any other classified file:
+
+```bash
+npm run load -- ../dosi-pregen-sections.json
+```
+
+It holds the six sections covering the Starter Set's five pregenerated
+characters — a backstory and a reason for being aboard the ship for each sheet,
+which the book leaves to the table. The book's markdown is deliberately not
+touched: authored prose added there would come back through a re-ingest tagged
+`source='book'`, and the whole point of that flag is that it can be trusted. So
+these live outside it, every read-aloud is `source='authored'`, and the
+overview section says in its own text that it is not the book's.
+
+Their ids (`0-hill-dwarf-cleric` and so on) are what `run.ts` would mint for
+headings of those names in chapter 0, so a future re-ingest that does pick the
+content up updates these rows rather than duplicating them. Their `order` values
+sit in a reserved 300000 band, following the creature (100000) and item (200000)
+convention, since the parsed chapter-0 orders 0–18 are contiguous and no
+sequential slot exists to insert into. The outline groups by chapter name rather
+than by contiguous runs, so they render at the end of "Running the Adventure".
+
 ## 7. Phase 0 findings
 
 Authoring the two fixture sections by hand changed three decisions.

@@ -1,0 +1,326 @@
+[
+  {
+    "id": "0-the-adventurers",
+    "module_id": "dosi",
+    "chapter": "Running the Adventure",
+    "heading": "The Adventurers",
+    "heading_path": [
+      "Running the Adventure",
+      "Getting Started"
+    ],
+    "order": 300000,
+    "type": "reference",
+    "reveals": [],
+    "references": [],
+    "read_aloud_text": "",
+    "dm_only_text": "",
+    "read_alouds": [
+      {
+        "ordinal": 0,
+        "source": "authored",
+        "cue": "To the whole table, before the merrow comes over the rail",
+        "text": "The ship is a coastal trader, three days out of Neverwinter and riding low: her hold is full of the things an island cannot make for itself — flour, lamp oil, nails, salt pork, a crate of books wrapped against the damp. She makes this run a few times a year, and she sells what deck space is left to anyone who can pay for it or work for it.\n\nThis crossing, that is the five of you. You have had three days of the same weather, the same food, and each other's company, which is long enough to have formed an opinion and not long enough to have tested it."
+      }
+    ],
+    "background_text": "The Starter Set comes with five ready-made characters: a hill dwarf cleric, a human paladin, a wood elf fighter, a lightfoot halfling rogue, and a high elf wizard. The book gives each of them exactly one hook — a dream, a sense of destiny, a disillusionment, a rumoured fortune, a letter — and hands everything else to the players: give the characters names, and invent their personality and appearance.\n\nThe five sections that follow fill the gap in between. Each takes its sheet's hook and gives it a history, and — since the adventure opens at sea, a few days out of Neverwinter — a reason for being aboard the ship. They are meant to be offered, not imposed. A player who turns up with an idea of their own should use it; these exist for the player who reads \"hill dwarf cleric\" and has no idea who that is yet.\n\nNone of this is the book's. The hooks underneath it are (see Individual Quests in chapter 1, where all five pay off); the biographies built around them are written for this table and can be rewritten for it. Nothing here contradicts the adventure, and nothing in the adventure depends on it.\n\nThe voyage needs no more than one shared fact: all five paid for passage on the same ship, and each of them chose to come to Stormwreck Isle. They need not have met before the deck they are standing on.",
+    "prompts": [
+      {
+        "ordinal": 0,
+        "text": "Ask each player for their character's name, and for one thing about them that the other four would have noticed in three days at sea."
+      },
+      {
+        "ordinal": 1,
+        "text": "Ask each player, in turn, why their character is on this ship. Anyone who would rather keep it to themselves may — the adventure holds together either way, and chapter 1 explicitly lets the party keep their reasons secret."
+      }
+    ],
+    "technique": [
+      {
+        "ordinal": 0,
+        "name": "Deal the hooks out one at a time",
+        "text": "Each character's passage is written to that player, in the second person. Read one to each player in turn before the storm arrives, or hand them out on paper if you would rather the others not hear. What matters is that every player knows something about their character that they did not have to invent on the spot."
+      },
+      {
+        "ordinal": 1,
+        "name": "Do not answer the hooks yourself",
+        "text": "All five point at Runara, and all five are answered in chapter 1 by what the characters actually do on the island. Resist tidying them up beforehand — the dream should not be explained, the destiny should not be named, and the treasure should not be found before the party has met Tarak."
+      }
+    ],
+    "conditionals": [
+      {
+        "ordinal": 0,
+        "kind": "variant",
+        "condition": "a player invents their own reason for the voyage",
+        "effect": "Use theirs and drop the passage here. The adventure asks only two things of a backstory: the character chose to sail to Stormwreck Isle, and there is something they would ask an elder's counsel about."
+      },
+      {
+        "ordinal": 1,
+        "kind": "variant",
+        "condition": "you are running the merrow demo from Voyage to Stormwreck Isle",
+        "effect": "Read these before the merrow appears; three days of shared boredom is what makes the interruption land. If you are skipping the demo and opening at Welcome to Dragon's Rest instead, read them over the ship's approach to the harbour."
+      }
+    ],
+    "features": []
+  },
+  {
+    "id": "0-hill-dwarf-cleric",
+    "module_id": "dosi",
+    "chapter": "Running the Adventure",
+    "heading": "Hill Dwarf Cleric",
+    "heading_path": [
+      "Running the Adventure",
+      "Getting Started",
+      "The Adventurers"
+    ],
+    "order": 300001,
+    "type": "reference",
+    "reveals": [],
+    "references": [
+      "1-the-cleric"
+    ],
+    "read_aloud_text": "",
+    "dm_only_text": "",
+    "read_alouds": [
+      {
+        "ordinal": 0,
+        "source": "authored",
+        "cue": "To the cleric's player, before the voyage scene",
+        "text": "Eleven nights now, and always the same: a grey shore, a sea gone flat and quiet, and something coming up out of the water that the light does not touch. You have knelt beside enough deathbeds to know death when you meet it, and the thing in the dream is not death. Death is patient. This is hungry.\n\nYou asked everyone at home whose judgement you trust, and got back kindness and no answers. Then a sailor in a Neverwinter taproom, hearing you describe it, mentioned an elder out on Stormwreck Isle who is supposed to see clearly into such things. You paid for deck passage that same afternoon.\n\nEleven nights. And each night the shore in the dream is a little closer."
+      }
+    ],
+    "background_text": "The sheet's hook is a recurring dream involving the shadow of death, and Runara's answer in chapter 1 is that the hunger the cleric keeps describing is the zombie problem — she listens, thinks, and points them at the wreck of Compass Rose.\n\nThe backstory below makes the cleric a working healer rather than a scholar of the divine: someone who has sat with the dying often enough to be certain that what walks in the dream is not death. That certainty is the whole hook. It is what makes the drowned sailors on the beach land as an answer rather than a coincidence, and it is why the cleric of all five characters should be the one who notices that the zombies are wrong rather than merely dangerous.\n\nKeep the dream one image short of an explanation. It is not a prophecy and it does not need a source; Aleitha's talisman in the hold of Compass Rose is as much of an answer as the adventure ever gives, and the cleric arriving at it themselves is worth more than any vision you could hand them.\n\nThe sheet does not name a god. Ask the player.",
+    "prompts": [
+      {
+        "ordinal": 0,
+        "text": "Ask the cleric's player which god they serve, and what one image from the dream stays with them after they wake. One image, not a story — the rest of the dream is still coming."
+      }
+    ],
+    "technique": [],
+    "conditionals": [
+      {
+        "ordinal": 0,
+        "kind": "branch",
+        "condition": "the cleric tells Runara about the dream",
+        "effect": "Individual Quests → The Cleric: she offers the zombies as the hunger the cleric described, and sends them to Compass Rose to look further."
+      },
+      {
+        "ordinal": 1,
+        "kind": "trigger",
+        "condition": "the cleric first sees the drowned sailors on the beach",
+        "effect": "Give them the dream's shoreline back for a beat before initiative — the flat sea, the light that does not land. Then let the player decide what it means."
+      }
+    ],
+    "features": []
+  },
+  {
+    "id": "0-human-paladin",
+    "module_id": "dosi",
+    "chapter": "Running the Adventure",
+    "heading": "Human Paladin",
+    "heading_path": [
+      "Running the Adventure",
+      "Getting Started",
+      "The Adventurers"
+    ],
+    "order": 300002,
+    "type": "reference",
+    "reveals": [],
+    "references": [
+      "1-the-paladin"
+    ],
+    "read_aloud_text": "",
+    "dm_only_text": "",
+    "read_alouds": [
+      {
+        "ordinal": 0,
+        "source": "authored",
+        "cue": "To the paladin's player, before the voyage scene",
+        "text": "You swore your oath in Neverwinter, in front of people who meant it, and for a while so did you. Then you learned the city: which clerk's palm decides whether a complaint is written down, which names make a case quietly go away, which of your own superiors could be relied on to look at the ceiling.\n\nYou did not fall. That is almost the worst of it — you kept every letter of the oath and watched it change nothing. When you finally handed back your post, nobody stopped you, and nothing about the city was different the following morning.\n\nA priest you respected told you about a cloister on Stormwreck Isle: no order, no rule, no one asking what you have come to atone for. Somewhere to be quiet and find out what your oath is for when there is no city to swear it in. You bought passage that week, and you have not yet worked out whether you are resting or running."
+      }
+    ],
+    "background_text": "The sheet's hook is disillusionment with the corruption of Neverwinter, and a search for rest and new resolve. Runara's answer in chapter 1 is to point the paladin at Tarak and Varnoth — a retired assassin and a retired mercenary general, both of whom got out of worse — and at the temple of Bahamut.\n\nSo the backstory needs the paladin to have been close enough to Neverwinter's machinery to be implicated by it, not merely disappointed in it from outside. The version below has them sworn in the city and serving in it long enough to learn how it really works: which clerk takes money, which cases are allowed to close, which are not. Nobody has driven them out. They left on their own, which is the harder and more interesting thing, and they are not certain they were right to.\n\nWhat finally broke is deliberately left blank. Let the player fill it, and remember it — the paladin's arc in this adventure is Runara asking, at the end, what they have learned about living in a world like that, and the answer means little unless the table knows what \"that\" was.\n\nThey are not fleeing an enemy. They are on leave from their own certainty.",
+    "prompts": [
+      {
+        "ordinal": 0,
+        "text": "Ask the paladin's player what finally made them leave — one specific case or one specific morning, not a general disgust."
+      },
+      {
+        "ordinal": 1,
+        "text": "Ask what they told the people they swore in front of, and whether it was the truth."
+      }
+    ],
+    "technique": [],
+    "conditionals": [
+      {
+        "ordinal": 0,
+        "kind": "branch",
+        "condition": "the paladin talks to Runara about why they came",
+        "effect": "Individual Quests → The Paladin: she sends them to Tarak and Varnoth, and encourages time in the temple of Bahamut."
+      },
+      {
+        "ordinal": 1,
+        "kind": "branch",
+        "condition": "the paladin has said aloud what they lost faith in",
+        "effect": "Runara's closing question at the end of the adventure — what have you learned about living in a world so corrupt? — has something to answer. If they have kept it private, ask the question anyway and let the silence do the work."
+      }
+    ],
+    "features": []
+  },
+  {
+    "id": "0-wood-elf-fighter",
+    "module_id": "dosi",
+    "chapter": "Running the Adventure",
+    "heading": "Wood Elf Fighter",
+    "heading_path": [
+      "Running the Adventure",
+      "Getting Started",
+      "The Adventurers"
+    ],
+    "order": 300003,
+    "type": "reference",
+    "reveals": [],
+    "references": [
+      "1-the-fighter"
+    ],
+    "read_aloud_text": "",
+    "dm_only_text": "",
+    "read_alouds": [
+      {
+        "ordinal": 0,
+        "source": "authored",
+        "cue": "To the fighter's player, before the voyage scene",
+        "text": "You have carried it as long as you can remember: the flat certainty that something is going to be asked of you. Not a voice, not a vision — a weight, the way a coming storm sits on the air hours before it breaks.\n\nYou have trained as though the asking might come tomorrow. You have taken work that seemed to be pointing somewhere. None of it has been the thing, and you have started to wonder whether a weight you cannot name is a calling at all, or just a habit of expecting one.\n\nAnd then a rumour, passed hand to hand up the coast: an elder living on Stormwreck Isle who can tell a true sign from a wish. Whichever answer she gives you, it will be more than you have now. You have spent most of the crossing at the rail, watching the water and rehearsing the question."
+      }
+    ],
+    "background_text": "The sheet's hook is a sense of destiny weighing on the character's shoulders, and it is the vaguest of the five on purpose. The adventure never pays it off with a prophecy: Runara's entire answer is that a destiny is something you recognise afterwards, in what you actually did — she points at the fight on the beach, then at the quests they choose to take, and at the end tells them it will become clear.\n\nThat only works if the feeling has a source but no content. So the backstory gives it a beginning the character can name — words said over them, or an unlikely survival, or an omen someone else read on their behalf — and refuses to say what it means. Do not invent a prophecy behind it, and do not let the table settle on one; a fighter who knows what their destiny is has nothing left to ask Runara.\n\nIf the player wants the feeling to be a mistake — a village's wishful thinking, an omen misread — that is a legitimate ending for this thread and Runara's counsel still fits it.",
+    "prompts": [
+      {
+        "ordinal": 0,
+        "text": "Ask the fighter's player where the feeling started — words said over them, a fight they walked away from that no one else did, an omen someone read for them. Take the source; do not take a meaning."
+      }
+    ],
+    "technique": [],
+    "conditionals": [
+      {
+        "ordinal": 0,
+        "kind": "branch",
+        "condition": "the fighter asks Runara about their destiny on arriving",
+        "effect": "Individual Quests → The Fighter: she turns it back on them, asking how their choice at the beach reflects it — or does not."
+      },
+      {
+        "ordinal": 1,
+        "kind": "branch",
+        "condition": "the fighter asks after finishing one or more quests",
+        "effect": "Runara offers their own actions as the first shape of the thing. At the end of the adventure she sends them on: if it is not clear yet, it soon will be."
+      }
+    ],
+    "features": []
+  },
+  {
+    "id": "0-lightfoot-halfling-rogue",
+    "module_id": "dosi",
+    "chapter": "Running the Adventure",
+    "heading": "Lightfoot Halfling Rogue",
+    "heading_path": [
+      "Running the Adventure",
+      "Getting Started",
+      "The Adventurers"
+    ],
+    "order": 300004,
+    "type": "reference",
+    "reveals": [],
+    "references": [
+      "1-the-rogue"
+    ],
+    "read_aloud_text": "",
+    "dm_only_text": "",
+    "read_alouds": [
+      {
+        "ordinal": 0,
+        "source": "authored",
+        "cue": "To the rogue's player, before the voyage scene",
+        "text": "The story cost you a good dinner and most of an evening's patience. It goes like this: a Gilded Gallows man walked out on the guild in Elturgard, took everything he had been sent to collect, and went to ground on a rock in the northern sea called Stormwreck Isle — where, being a careful sort, he buried it and never spent a copper.\n\nYou have now heard four versions. The amount changes, the man's name changes, in one of them he is dead. The island never changes. That is the part you trust.\n\nPassage north took most of what you had left, which is either a sound investment or the single stupidest thing you have ever done. You will know within the week."
+      }
+    ],
+    "background_text": "The sheet's hook is a fortune supposedly hidden on the island by a member of the Gilded Gallows, and the DM needs the truth before the first session: there is no fortune. The thieves' guild member is Tarak, the cloister's gardener. His last assignment was to kill a traitor who turned out to be his lover; the two ran from Elturgard together, she was killed by another assassin, and he got away with nothing. The treasure is what the story turned into on its way across the sea.\n\nThat makes the rogue's thread the one that resolves in a conversation rather than a dig, so the backstory should make the rogue someone who bought a story rather than someone who was told a secret. Let them search wherever they like — the island is full of places a fortune could plausibly be, and their disappointment is worth playing straight.\n\nThe satisfying version is the rogue getting the true account out of Tarak himself, and having to decide what they now want, given that what they came for does not exist. Tarak's own answer — that he left the life, and perhaps it is time they did too — lands hardest if the rogue has already spent a session or two looking.\n\nDo not make Tarak evasive. He is a gardener who has stopped hiding; he simply has nothing to hand over.",
+    "prompts": [
+      {
+        "ordinal": 0,
+        "text": "Ask the rogue's player what the money is for. It matters later, when there is no money."
+      },
+      {
+        "ordinal": 1,
+        "text": "Ask how they came by the story, and who else was in the room when they heard it."
+      }
+    ],
+    "technique": [],
+    "conditionals": [
+      {
+        "ordinal": 0,
+        "kind": "branch",
+        "condition": "the rogue asks Tarak about the Gilded Gallows or the fortune",
+        "effect": "Individual Quests → The Rogue: he gives them the true version — the assassination, his lover, the flight from Elturgard, no treasure — and suggests it might be time they left the life too."
+      },
+      {
+        "ordinal": 1,
+        "kind": "trigger",
+        "condition": "the rogue searches Dragon's Rest for the cache",
+        "effect": "Let them search and find nothing, without hinting. The cloister's own residents have no idea what they are looking for, and Tarak least of all expects it."
+      }
+    ],
+    "features": []
+  },
+  {
+    "id": "0-high-elf-wizard",
+    "module_id": "dosi",
+    "chapter": "Running the Adventure",
+    "heading": "High Elf Wizard",
+    "heading_path": [
+      "Running the Adventure",
+      "Getting Started",
+      "The Adventurers"
+    ],
+    "order": 300005,
+    "type": "reference",
+    "reveals": [],
+    "references": [
+      "1-the-wizard"
+    ],
+    "read_aloud_text": "",
+    "dm_only_text": "",
+    "read_alouds": [
+      {
+        "ordinal": 0,
+        "source": "authored",
+        "cue": "To the wizard's player, before the voyage scene",
+        "text": "The letter came in a bundle of ordinary correspondence and you have read it perhaps forty times since. Six pages in a hand you know well — a colleague, older than you, further along, and not given to enthusiasm — about an observatory on a cliff on Stormwreck Isle, abandoned so long that the charts have stopped marking it.\n\nWhat was recorded there, they write, was recorded nowhere else, and has been lost for longer than either of you can properly count. Then, on the last page, almost in passing: they are too old now to make the crossing themselves.\n\nYou wrote back the same day asking for everything they had. No answer came. You have decided not to wait for one, and the letter is folded in your pack where you can reach it."
+      }
+    ],
+    "background_text": "The sheet's hook is a letter from a colleague about lost knowledge held in the Clifftop Observatory, and it is the most concrete of the five: it names a place the adventure ends in. Runara will not send them there until they have proved themselves — many have sought that knowledge, and the wizard must first show they are worthy — so the whole of chapter 1 is, for this character, the price of an address.\n\nThe backstory below keeps the colleague offstage and slightly out of reach, which is what makes the letter usable: it can say enough to be worth crossing the sea for and still leave the observatory itself unexplained. Do not let the wizard arrive already knowing about the moonstone key, Sparkrender, or the dragon buried under the site. What they have is a claim that something was recorded there and nowhere else.\n\nIf the player asks what their colleague knows, the honest answer is: less than they implied, and they are not here to be cross-examined.",
+    "prompts": [
+      {
+        "ordinal": 0,
+        "text": "Ask the wizard's player what they hope is in the observatory, and what they intend to do with it if it is there."
+      },
+      {
+        "ordinal": 1,
+        "text": "Ask who the colleague is, and why the letter came to this wizard rather than to someone more senior."
+      }
+    ],
+    "technique": [],
+    "conditionals": [
+      {
+        "ordinal": 0,
+        "kind": "branch",
+        "condition": "the wizard asks Runara about the observatory",
+        "effect": "Individual Quests → The Wizard: she can direct them there, but not yet — first they must show they are worthy. She keeps the promise once the island's other problems are dealt with."
+      },
+      {
+        "ordinal": 1,
+        "kind": "branch",
+        "condition": "the party has cleared the zombies, the myconids and the shipwreck",
+        "effect": "Lost Wyrmling: Runara's summons to the temple is also the wizard's answer. Give the moonstone key to the wizard if the table has no other view on it."
+      }
+    ],
+    "features": []
+  }
+]
